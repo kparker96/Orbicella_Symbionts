@@ -204,6 +204,70 @@ setdiff(reruns$Sample.Name, Ofav_dupes_f2$Sample.Name)
 
 ```{r}
 Ofav <- Ofav_good %>%
-  select(Sample.Name, depth, A.prop, B.prop, C.prop, D.prop, dom_sym)
+   mutate(Symbiodinium = case_when(A.prop > 0 ~ A.prop),
+         Breviolum = case_when(B.prop > 0 ~ B.prop),
+         Cladocopium = case_when(C.prop > 0 ~ C.prop),
+         Durusdinium = case_when(D.prop > 0 ~ D.prop)) %>%
+   mutate(Symbiodinium = ifelse(is.na(Symbiodinium), 0, Symbiodinium),
+          Breviolum = ifelse(is.na(Breviolum), 0, Breviolum),
+          Cladocopium = ifelse(is.na(Cladocopium), 0, Cladocopium),
+          Durusdinium = ifelse(is.na(Durusdinium), 0, Durusdinium)) %>%
+  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym) %>%
+  ungroup()
+  
 ```
 
+
+# Stacked Bar Plot of Symbiont Composition per Sample in order of depth 
+```{r}
+a <- Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = "sym", value = "value", -Sample.Name) 
+
+
+ggplot(a, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
+```
+
+#Dominant Symbiont Proportion across Depth
+```{r}
+dom_sym <- Ofav %>%
+  select(Sample.Name, depth, dom_sym) %>%
+  filter(depth != "NA") %>%
+  mutate(depth_int = cut(depth, breaks = 8)) %>%
+  group_by(depth_int, dom_sym) %>%
+  summarise(ncol = n()) %>%
+  mutate(n = sum(ncol), label = paste0("N =", n)) %>%
+  mutate(prop = ncol/n)
+
+
+ggplot(dom_sym, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
+  geom_bar(stat = "identity", position = "fill", size =20) +
+  geom_text(aes(x = as.factor(depth_int), y = 1.05, label =label), inherit.aes = FALSE) +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+```
+
+# Dominant Symbiont Proportion less than 8m
+```{r}
+b <- Ofav %>%
+  filter(depth < 8) %>%
+  select(Sample.Name, depth, dom_sym) %>%
+  filter(depth != "NA") %>%
+  mutate(depth_int = cut(depth, breaks = 8)) %>%
+  group_by(depth_int, dom_sym) %>%
+  summarise(ncol = n()) %>%
+  mutate(n = sum(ncol), label = paste0("N =", n)) %>%
+  mutate(prop = ncol/n)
+
+ggplot(b, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
+  geom_bar(stat = "identity", position = "fill", size =20) +
+  geom_text(aes(x = as.factor(depth_int), y = 1.05, label =label), inherit.aes = FALSE) +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+```
+
+
+### Questions 
+# 1. What is the probability of D-Dominance across depth
+# 2. What is the probability of Symbiont Combinations

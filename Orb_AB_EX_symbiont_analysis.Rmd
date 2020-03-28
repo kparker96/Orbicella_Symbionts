@@ -20,7 +20,7 @@ library(tidyverse) # (install.packages("tidyverse")
 ```{r}
 # List Exuma symbiodinium data files
 plates_EX <- list.files(path = "Data/qPCR_EX", pattern = ".txt", full.names = TRUE)
-plates
+
 # Read in data and calculate target ratios
 df_EX <- steponeR(files = plates_EX,
                delim = "\t", 
@@ -56,7 +56,7 @@ qpcr_EX_Ofav <- EX_Ofav %>%
 ```{r}
 # List Sandy Cay symbiodinium data files
 plates_AB <- list.files(path = "Data/qPCR_AB", pattern = ".txt", full.names = TRUE)
-plates
+
 # Read in data and calculate target ratios
 df_AB <- steponeR(files = plates_AB, 
                delim = "\t", 
@@ -172,7 +172,7 @@ Ofav_dupes_f2 <- Ofav_dupes_f1 %>%
 # Raw Data fine on the first run
 qpcr_good <- qpcr %>%
   filter(Sample.Name != "PTC", Sample.Name != "NTC") %>%
-  filter(!(Sample.Name %in% reruns$Sample.Name))%>%
+  filter(!(Sample.Name %in% reruns$Sample.Name)) %>%
   filter(!(Sample.Name %in% fails$Sample.Name))
 
 
@@ -271,3 +271,73 @@ ggplot(b, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
 ### Questions 
 # 1. What is the probability of D-Dominance across depth
 # 2. What is the probability of Symbiont Combinations
+
+```{r}
+Ofav_mix <- Ofav %>%
+  filter(Symbiodinium != 1 & Breviolum != 1 & Cladocopium != 1 & Durusdinium != 1)
+
+net_data_orb <- Ofav_mix %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+edges_orb <- net_data_orb %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1/2))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+depth_orb <- Ofav %>%
+  select(Sample.Name, depth)
+
+verts_orb <- tibble(Sample.Name = c(net_data_orb$Sample.Name, colnames(net_data_orb)[-1])) %>%
+  left_join(depth_orb) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+net_orb <- graph_from_data_frame(edges_orb, directed = FALSE, vertices = verts_orb)
+
+set.seed(7)
+
+plot(net_orb, edge.curved = 0,
+     edge.width = 5 * (E(net_orb)$weight)^0.5, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(net_orb)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl("EX|MR|SC", names(V(net_orb))), 10, 15),
+     vertex.color = ifelse(grepl("EX|MR|SC", names(V(net_orb))), 
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(net_orb)$depth,breaks = 100))],
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c')))
+```
+
+```{r}
+Ofav
+
+Ofav_pa <- Ofav %>%
+  select(Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  mutate_at(vars(Symbiodinium, Breviolum, Cladocopium, Durusdinium), 
+            function(x) x > 0)
+
+Ofav_pa
+
+vennCounts(Ofav_pa)
+vennDiagram(Ofav_pa)
+```
+
+```{r}
+edges <- tribble(
+  ~colA, ~colB, ~weight,
+  "A", "B", 12,
+  "A", "C", 7,
+  "A", "D", 3,
+  "B", "C", 11,
+  "B", "D", 6,
+  "C", "D", 6
+)
+nodes <- c("A", "B", "C", "D")
+
+nn <- graph_from_data_frame(edges, directed = FALSE, vertices = nodes)
+plot(nn, edge.width = E(nn)$weight)
+```
+

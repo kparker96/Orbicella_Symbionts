@@ -20,7 +20,7 @@ library(tidyverse) # (install.packages("tidyverse")
 ```{r}
 # List Exuma symbiodinium data files
 plates_EX <- list.files(path = "Data/qPCR_EX", pattern = ".txt", full.names = TRUE)
-plates
+
 # Read in data and calculate target ratios
 df_EX <- steponeR(files = plates_EX,
                delim = "\t", 
@@ -56,7 +56,7 @@ qpcr_EX_Ofav <- EX_Ofav %>%
 ```{r}
 # List Sandy Cay symbiodinium data files
 plates_AB <- list.files(path = "Data/qPCR_AB", pattern = ".txt", full.names = TRUE)
-plates
+
 # Read in data and calculate target ratios
 df_AB <- steponeR(files = plates_AB, 
                delim = "\t", 
@@ -110,11 +110,7 @@ qpcr_prop <- qpcr_copy_num %>%
   mutate(total = sum(A.N + B.N + C.N + D.N))%>%
   mutate(A.prop = A.N/total, B.prop = B.N/total, C.prop = C.N/total, D.prop = D.N/total)
 
-qpcr_symname <- qpcr_prop %>%
-  mutate(dom_sym = case_when(B.prop > C.prop & B.prop > D.prop & B.prop > A.prop ~ "Breviolum",
-                             C.prop > B.prop & C.prop > D.prop & C.prop > A.prop ~ "Cladocopium",
-                             D.prop > B.prop & D.prop > C.prop & D.prop > A.prop ~ "Durusdinium",
-                             A.prop > B.prop & A.prop > C.prop & A.prop > D.prop ~ "Symbiodinium"))
+
    
 ```
 
@@ -122,7 +118,7 @@ qpcr_symname <- qpcr_prop %>%
 # Oranizing Raw qPCR Data
 ```{r}
 # Convert NaN CT values to 0  
-qpcr <- qpcr_symname %>%
+qpcr <- qpcr_prop %>%
  mutate(A.CT.mean = ifelse(is.na(A.CT.mean), 0, A.CT.mean),
          B.CT.mean = ifelse(is.na(B.CT.mean), 0, B.CT.mean),
          C.CT.mean = ifelse(is.na(C.CT.mean), 0, C.CT.mean),
@@ -130,31 +126,31 @@ qpcr <- qpcr_symname %>%
 
 # Samples that did not amplify for any symbionts
 fails <- qpcr %>%
-  filter(A.CT.mean == 0 & B.CT.mean == 0 & C.CT.mean == 0 & D.CT.mean == 0,
-         Sample.Name != "PTC",
-         Sample.Name != "NTC")
+  filter(A.CT.mean == 0 & B.CT.mean == 0 & C.CT.mean == 0 & D.CT.mean == 0) 
 
 # Samples that need to be rerun due to 1 technical replicate or SD > 1
 reruns <- qpcr %>%
   filter(Sample.Name != "PTC", Sample.Name != "NTC") %>%
   filter(A.reps == 1 | B.reps == 1 | C.reps == 1 | D.reps == 1 | A.CT.sd > 1.05 | B.CT.sd > 1.05 | C.CT.sd > 1.05 | D.CT.sd > 1.05)
+
+qpcr_data <- qpcr %>%
+   filter(A.CT.mean != 0 | B.CT.mean != 0 | C.CT.mean != 0 | D.CT.mean != 0)
+
+  
 ```
 
 #Filtering out "bad" data/replicates
 ```{r}
-#Determing which samples have 2 replicates in the data set and did not fail
-dupes <- qpcr %>%
-  filter(Sample.Name != "PTC", Sample.Name != "NTC") %>%
-  filter(!(A.CT.mean == 0 & B.CT.mean == 0 & C.CT.mean == 0 & D.CT.mean == 0)) %>%
+#Determing which samples have 2 replicates in the data set 
+dupes <- qpcr_data %>%
   group_by(Sample.Name) %>%
   count(vars = "Sample.Name") %>%
   filter(n > 1) 
 
 #Gathering the full data for samples with 2 replicates
-Ofav_dupes <- qpcr %>%
+Ofav_dupes <- qpcr_data %>%
   filter(Sample.Name %in% dupes$Sample.Name) %>%
-  arrange(Sample.Name)%>%
-  filter(!(A.CT.mean == 0 & B.CT.mean == 0 & C.CT.mean == 0 & D.CT.mean == 0))
+  arrange(Sample.Name)
 
 #filtering out data with only 1 technical replicate
 Ofav_dupes_f1 <- Ofav_dupes %>%
@@ -169,39 +165,34 @@ Ofav_dupes_f2 <- Ofav_dupes_f1 %>%
   group_by(Sample.Name) %>%
   dplyr::filter(avg_sd == min(avg_sd)) 
 
-# Raw Data fine on the first run
-qpcr_good <- qpcr %>%
-  filter(Sample.Name != "PTC", Sample.Name != "NTC") %>%
-  filter(!(Sample.Name %in% reruns$Sample.Name))%>%
-  filter(!(Sample.Name %in% fails$Sample.Name))
+# Raw Data with no replicates
+qpcr_good <- qpcr_data %>%
+  filter(!(Sample.Name %in% dupes$Sample.Name))
 
 
 # Cleaned dataset from data that worked the first run and "clean" replicates 
 Ofav_good <- qpcr_good %>%
-  filter(!Sample.Name %in% dupes$Sample.Name) %>%
   bind_rows(Ofav_dupes_f2)
+
 
 need_2_clean <- Ofav_good %>%
   group_by(Sample.Name) %>%
   count(vars = "Sample.Name") %>%
   filter(n > 1) 
 
-
 # Which Samples Were Duplicated and Still Need to be Rerun?
 setdiff(Ofav_dupes$Sample.Name, Ofav_dupes_f2$Sample.Name)
-# EX066 and Ex0248 We need to give up on, won't produce 2 technical replicates for certain symbionts
-# EX0270 check where it disappears because 1 of 3 should have gotten through
-# SC002 and SC004 "   "                                                               "
+# EX066, Ex0249 won't produce 2 technical replicates for symbionts
+# EX0188 failed and do not have rerun data 
 
 setdiff(fails$Sample.Name, Ofav_good$Sample.Name)
 
 # Samples that need to be rerun
 setdiff(reruns$Sample.Name, Ofav_dupes_f2$Sample.Name)
-# Give up on: EX0066, EX0249
-# EX0270 from 20190917_KP_01.txt should make it through 
-# MR034 and 040 Should make it through 
 ```
 
+
+# Renaming symbiont columns to genus name and determing dominant symbiont of each sample 
 ```{r}
 Ofav <- Ofav_good %>%
    mutate(Symbiodinium = case_when(A.prop > 0 ~ A.prop),
@@ -212,6 +203,10 @@ Ofav <- Ofav_good %>%
           Breviolum = ifelse(is.na(Breviolum), 0, Breviolum),
           Cladocopium = ifelse(is.na(Cladocopium), 0, Cladocopium),
           Durusdinium = ifelse(is.na(Durusdinium), 0, Durusdinium)) %>%
+  mutate(dom_sym = case_when(B.prop > C.prop & B.prop > D.prop & B.prop > A.prop ~ "Breviolum",
+                             C.prop > B.prop & C.prop > D.prop & C.prop > A.prop ~ "Cladocopium",
+                             D.prop > B.prop & D.prop > C.prop & D.prop > A.prop ~ "Durusdinium",
+                             A.prop > B.prop & A.prop > C.prop & A.prop > D.prop ~ "Symbiodinium")) %>%
   select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym) %>%
   ungroup()
   

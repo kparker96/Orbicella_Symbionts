@@ -208,10 +208,12 @@ Ofav_symname <- Ofav_good %>%
 
 # Import Florida Keys Data and combine with Exumas and Abaco Data
 ```{r}
-KEY_Ofav <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_FL_Keys_2015-2016.xlsx") %>%
-  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium) 
+KEY_Ofav <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx")
+
+KEY_rbind <- KEY_Ofav %>%
+  select(Sample.Name, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
   
-Ofav<- rbind(Ofav_symname, KEY_Ofav) %>%
+Ofav<- rbind(Ofav_symname, KEY_rbind) %>%
   mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
                              ~ "Breviolum",
                              Cladocopium > Breviolum & Cladocopium > Durusdinium & Cladocopium > Symbiodinium

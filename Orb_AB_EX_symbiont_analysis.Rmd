@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ---
 title: "Orb_EX_AB_sym_analysis"
 output: html_document
@@ -350,3 +351,359 @@ plot(nn, edge.width = E(nn)$weight)
 ```
 
 >>>>>>> 73004340b30c30f0b10ec6dd42f7dada5f227344
+=======
+<<<<<<< HEAD
+---
+title: "Orb_EX_AB_sym_analysis"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(devtools)   # install.packages("devtools")
+library(steponeR) # install_github("jrcunning/steponeR")
+library(tidyverse) # (install.packages("tidyverse")
+```
+
+
+#Importing Raw qPCR Data from Quant Studio Design and Analysis Software 
+```{r}
+# List Exuma symbiodinium data files
+plates_EX <- list.files(path = "Data/qPCR_EX", pattern = ".txt", full.names = TRUE)
+
+# Read in data and calculate target ratios
+df_EX <- steponeR(files = plates_EX,
+               delim = "\t", 
+               target.ratios = "A.A", 
+               fluor.norm = list(C = 2.234, D = 1, A = 1, B = 1),
+               copy.number = list(C = 20, D = 3, A = 1, B = 1),
+               ploidy = list(C = 1, D = 1, A = 1, B = 1),
+               extract = list(C = 0.813, D = 0.813, A = 0.813, B = 0.813))
+qpcr_EX <- df_EX$result
+
+```
+
+#Filtering out other species from EX Raw qPCR data
+```{r}
+# Import Sample Data 
+library(readr)
+
+raw_sample_data <- readxl::read_xlsx("Data/Sample_data/Ex_Sample_Data.xlsx")
+
+#renaming  colomns of sample data to match qpcr data
+sample_data_EX <- raw_sample_data %>%
+  select(Sample.Name = sample_id, site, genus, species, depth = colony_depth_m, range)
+
+# Joining sample data with qpcr data and removing NA samples
+EX_Ofav <- right_join(sample_data_EX, qpcr_EX, by = "Sample.Name", all = TRUE) %>%
+  filter(genus == "orbicella")
+
+qpcr_EX_Ofav <- EX_Ofav %>%
+  select(Sample.Name, File.Name, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd, B.CT.sd, C.CT.sd,
+         D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A)
+```
+
+```{r}
+# List Sandy Cay symbiodinium data files
+plates_AB <- list.files(path = "Data/qPCR_AB", pattern = ".txt", full.names = TRUE)
+
+# Read in data and calculate target ratios
+df_AB <- steponeR(files = plates_AB, 
+               delim = "\t", 
+               target.ratios = "A.A", 
+               fluor.norm = list(C = 2.234, D = 1, Orb = 1, A = 1, B = 1),
+               copy.number = list(C = 20, D = 3, Orb = 1, A = 1, B = 1),
+               ploidy = list(C = 1, D = 1, Orb = 2, A = 1, B = 1),
+               extract = list(C = 0.813, D = 0.813, Orb = 0.982, A = 0.813, B = 0.813))
+qpcr_AB <- df_AB$result %>%
+  select(Sample.Name, File.Name, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd, B.CT.sd, C.CT.sd,
+         D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A)
+```
+
+#Import Depth Data and Add to qpcr_good df
+```{r}
+#library(readr)
+sample_data_AB <- readxl::read_xlsx("Data/Sample_data/sample_data.xlsx") %>%
+  select(Sample.Name = tube_label, depth = colony_depth_m)
+
+qpcr_AB_Ofav <- right_join(sample_data_AB, qpcr_AB, by = "Sample.Name", all = TRUE)
+
+```
+
+```{r}
+Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav)
+```
+
+# Establishing Ratios
+```{r}
+# adjust CT for flouresence 
+qpcr_flor <-Ofav_qpcr %>%
+  mutate(A.CT.mean = A.CT.mean - 1, 
+         B.CT.mean = B.CT.mean - 1,
+         C.CT.mean = C.CT.mean - 1,
+         D.CT.mean = D.CT.mean - 1)
+
+# adjust CT to form ratio of Symbiont divided by Copy # (Currently a Placeholder #)
+qpcr_copy_num <- qpcr_flor %>%
+  mutate(N = 15) %>%
+  mutate(A.N = 2^(N - A.CT.mean)/1,
+         B.N = 2^(N - B.CT.mean)/1,
+         C.N = 2^(N - C.CT.mean)/1,
+         D.N = 2^(N - D.CT.mean)/1)
+
+qpcr_prop <- qpcr_copy_num %>%
+  mutate(A.N = ifelse(is.na(A.N), 0, A.N),
+         B.N = ifelse(is.na(B.N), 0, B.N),
+         C.N = ifelse(is.na(C.N), 0, C.N),
+         D.N = ifelse(is.na(D.N), 0, D.N)) %>%
+  rowwise() %>%
+  mutate(total = sum(A.N + B.N + C.N + D.N))%>%
+  mutate(A.prop = A.N/total, B.prop = B.N/total, C.prop = C.N/total, D.prop = D.N/total)
+   
+```
+
+
+# Oranizing Raw qPCR Data
+```{r}
+# Convert NaN CT values to 0  
+qpcr <- qpcr_prop %>%
+ mutate(A.CT.mean = ifelse(is.na(A.CT.mean), 0, A.CT.mean),
+         B.CT.mean = ifelse(is.na(B.CT.mean), 0, B.CT.mean),
+         C.CT.mean = ifelse(is.na(C.CT.mean), 0, C.CT.mean),
+         D.CT.mean = ifelse(is.na(D.CT.mean), 0, D.CT.mean))
+
+# Samples that did not amplify for any symbionts
+fails <- qpcr %>%
+  filter(A.CT.mean == 0 & B.CT.mean == 0 & C.CT.mean == 0 & D.CT.mean == 0) 
+
+# Samples that need to be rerun due to 1 technical replicate or SD > 1
+reruns <- qpcr %>%
+  filter(Sample.Name != "PTC", Sample.Name != "NTC") %>%
+  filter(A.reps == 1 | B.reps == 1 | C.reps == 1 | D.reps == 1 | A.CT.sd > 1.05 | B.CT.sd > 1.05 | C.CT.sd > 1.05 | D.CT.sd > 1.05)
+
+qpcr_data <- qpcr %>%
+   filter(A.CT.mean != 0 | B.CT.mean != 0 | C.CT.mean != 0 | D.CT.mean != 0)
+
+  
+```
+
+#Filtering out "bad" data/replicates
+```{r}
+#Determing which samples have 2 replicates in the data set 
+dupes <- qpcr_data %>%
+  group_by(Sample.Name) %>%
+  count(vars = "Sample.Name") %>%
+  filter(n > 1) 
+
+#Gathering the full data for samples with 2 replicates
+Ofav_dupes <- qpcr_data %>%
+  filter(Sample.Name %in% dupes$Sample.Name) %>%
+  arrange(Sample.Name)
+
+#filtering out data with only 1 technical replicate
+Ofav_dupes_f1 <- Ofav_dupes %>%
+  group_by(Sample.Name) %>%
+  filter(A.reps != 1, B.reps != 1, C.reps != 1, D.reps != 1) %>%
+  ungroup()
+  
+# Average SD  
+Ofav_dupes_f2 <- Ofav_dupes_f1 %>%
+  rowwise() %>%
+  mutate(avg_sd = mean(c(A.CT.sd, B.CT.sd, C.CT.sd, D.CT.sd), na.rm = TRUE)) %>%
+  group_by(Sample.Name) %>%
+  dplyr::filter(avg_sd == min(avg_sd)) 
+
+# Raw Data with no replicates
+qpcr_good <- qpcr_data %>%
+  filter(!(Sample.Name %in% dupes$Sample.Name))
+
+
+# Cleaned dataset from data that worked the first run and "clean" replicates 
+Ofav_good <- qpcr_good %>%
+  bind_rows(Ofav_dupes_f2)
+
+
+need_2_clean <- Ofav_good %>%
+  group_by(Sample.Name) %>%
+  count(vars = "Sample.Name") %>%
+  filter(n > 1) 
+
+# Which Samples Were Duplicated and Still Need to be Rerun?
+setdiff(Ofav_dupes$Sample.Name, Ofav_dupes_f2$Sample.Name)
+# EX066, Ex0249 won't produce 2 technical replicates for symbionts
+# EX0188 failed and do not have rerun data 
+
+setdiff(fails$Sample.Name, Ofav_good$Sample.Name)
+
+# Samples that need to be rerun
+setdiff(reruns$Sample.Name, Ofav_dupes_f2$Sample.Name)
+```
+
+# Convert Clade to Genera names, Convert NA proportions to 0
+```{r}
+Ofav_symname <- Ofav_good %>%
+   mutate(Symbiodinium = case_when(A.prop > 0 ~ A.prop),
+         Breviolum = case_when(B.prop > 0 ~ B.prop),
+         Cladocopium = case_when(C.prop > 0 ~ C.prop),
+         Durusdinium = case_when(D.prop > 0 ~ D.prop)) %>%
+   mutate(Symbiodinium = ifelse(is.na(Symbiodinium), 0, Symbiodinium),
+          Breviolum = ifelse(is.na(Breviolum), 0, Breviolum),
+          Cladocopium = ifelse(is.na(Cladocopium), 0, Cladocopium),
+          Durusdinium = ifelse(is.na(Durusdinium), 0, Durusdinium)) %>%
+  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+
+```
+
+# Import Florida Keys Data and combine with Exumas and Abaco Data
+```{r}
+KEY_Ofav <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx")
+
+KEY_rbind <- KEY_Ofav %>%
+  select(Sample.Name, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+  
+Ofav<- rbind(Ofav_symname, KEY_rbind) %>%
+  mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
+                             ~ "Breviolum",
+                             Cladocopium > Breviolum & Cladocopium > Durusdinium & Cladocopium > Symbiodinium
+                             ~ "Cladocopium",
+                             Durusdinium > Breviolum & Durusdinium > Cladocopium & Durusdinium > Symbiodinium
+                             ~ "Durusdinium",
+                             Symbiodinium > Breviolum & Symbiodinium > Cladocopium & Symbiodinium >
+                             Durusdinium ~ "Symbiodinium")) %>%
+  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym) %>%
+  ungroup()
+
+
+```
+
+# Stacked Bar Plot of Symbiont Composition per Sample in order of depth 
+```{r}
+a <- Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = "sym", value = "value", -Sample.Name) 
+
+
+ggplot(a, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
+```
+
+#Dominant Symbiont Proportion across Depth
+```{r}
+dom_sym <- Ofav %>%
+  select(Sample.Name, depth, dom_sym) %>%
+  filter(depth != "NA") %>%
+  mutate(depth_int = cut(depth, breaks = 8)) %>%
+  group_by(depth_int, dom_sym) %>%
+  summarise(ncol = n()) %>%
+  mutate(n = sum(ncol), label = paste0("N =", n)) %>%
+  mutate(prop = ncol/n)
+
+
+ggplot(dom_sym, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
+  geom_bar(stat = "identity", position = "fill", size =20) +
+  geom_text(aes(x = as.factor(depth_int), y = 1.05, label =label), inherit.aes = FALSE) +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+```
+
+# Dominant Symbiont Proportion less than 8m
+```{r}
+b <- Ofav %>%
+  filter(depth < 8) %>%
+  select(Sample.Name, depth, dom_sym) %>%
+  filter(depth != "NA") %>%
+  mutate(depth_int = cut(depth, breaks = 8)) %>%
+  group_by(depth_int, dom_sym) %>%
+  summarise(ncol = n()) %>%
+  mutate(n = sum(ncol), label = paste0("N =", n)) %>%
+  mutate(prop = ncol/n)
+
+ggplot(b, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
+  geom_bar(stat = "identity", position = "fill", size =20) +
+  geom_text(aes(x = as.factor(depth_int), y = 1.05, label =label), inherit.aes = FALSE) +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+```
+
+
+### Questions 
+# 1. What is the probability of D-Dominance across depth
+# 2. What is the probability of Symbiont Combinations
+
+```{r}
+Ofav_mix <- Ofav %>%
+  filter(Symbiodinium != 1 & Breviolum != 1 & Cladocopium != 1 & Durusdinium != 1)
+
+net_data_orb <- Ofav_mix %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+edges_orb <- net_data_orb %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1/2))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+depth_orb <- Ofav %>%
+  select(Sample.Name, depth)
+
+verts_orb <- tibble(Sample.Name = c(net_data_orb$Sample.Name, colnames(net_data_orb)[-1])) %>%
+  left_join(depth_orb) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+net_orb <- graph_from_data_frame(edges_orb, directed = FALSE, vertices = verts_orb)
+
+set.seed(7)
+
+plot(net_orb, edge.curved = 0,
+     edge.width = 5 * (E(net_orb)$weight)^0.5, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(net_orb)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl("EX|MR|SC", names(V(net_orb))), 10, 15),
+     vertex.color = ifelse(grepl("EX|MR|SC", names(V(net_orb))), 
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(net_orb)$depth,breaks = 100))],
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c')))
+```
+
+```{r}
+Ofav
+
+Ofav_pa <- Ofav %>%
+  select(Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  mutate_at(vars(Symbiodinium, Breviolum, Cladocopium, Durusdinium), 
+            function(x) x > 0)
+
+Ofav_pa
+
+vennCounts(Ofav_pa)
+vennDiagram(Ofav_pa)
+```
+
+```{r}
+edges <- tribble(
+  ~colA, ~colB, ~weight,
+  "A", "B", 12,
+  "A", "C", 7,
+  "A", "D", 3,
+  "B", "C", 11,
+  "B", "D", 6,
+  "C", "D", 6
+)
+nodes <- c("A", "B", "C", "D")
+
+nn <- graph_from_data_frame(edges, directed = FALSE, vertices = nodes)
+plot(nn, edge.width = E(nn)$weight)
+```
+
+>>>>>>> 73004340b30c30f0b10ec6dd42f7dada5f227344
+>>>>>>> e35e6a9b260cba0f2c0c43f4e13b82d193496aa4

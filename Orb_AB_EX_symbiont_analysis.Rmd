@@ -290,7 +290,7 @@ net_data_orb <- Ofav_mix %>%
 edges_orb <- net_data_orb %>%
   gather(key = "Genera", value = "weight", -Sample.Name) %>%
   filter(weight != 0) %>%
-  mutate(weight = weight^(1/2))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
 
 depth_orb <- Ofav %>%
   select(Sample.Name, depth)
@@ -306,17 +306,17 @@ net_orb <- graph_from_data_frame(edges_orb, directed = FALSE, vertices = verts_o
 set.seed(7)
 
 plot(net_orb, edge.curved = 0,
-     edge.width = 5 * (E(net_orb)$weight)^0.5, 
+     edge.width = 2 * (E(net_orb)$weight)^0.4, 
      edge.color = "gray65",
      edge.curved = 1,
      vertex.label = V(net_orb)$lab,
      vertex.label.font = 2,
      vertex.label.cex = 2.5,
      vertex.label.color = "black", 
-     vertex.size = ifelse(grepl("EX|MR|SC", names(V(net_orb))), 10, 15),
-     vertex.color = ifelse(grepl("EX|MR|SC", names(V(net_orb))), 
-                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(net_orb)$depth,breaks = 100))],
-                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c')))
+     vertex.size = ifelse(grepl(".*um", names(V(net_orb))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(net_orb))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(net_orb)$depth,breaks = 100))]))
 ```
 
 ```{r}

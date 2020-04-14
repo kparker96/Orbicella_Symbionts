@@ -16,7 +16,7 @@ library(tidyverse) # (install.packages("tidyverse")
 ```
 
 
-#Importing Raw qPCR Data from Quant Studio Design and Analysis Software 
+#Importing Raw Exumas qPCR Data from Quant Studio Design and Analysis Software 
 ```{r}
 # List Exuma symbiodinium data files
 plates_EX <- list.files(path = "Data/qPCR_EX", pattern = ".txt", full.names = TRUE)
@@ -53,8 +53,9 @@ qpcr_EX_Ofav <- EX_Ofav %>%
          D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A)
 ```
 
+
+#Importing Raw Abaco qPCR Data from Quant Studio Design and Analysis Software 
 ```{r}
-# List Sandy Cay symbiodinium data files
 plates_AB <- list.files(path = "Data/qPCR_AB", pattern = ".txt", full.names = TRUE)
 
 # Read in data and calculate target ratios
@@ -70,7 +71,7 @@ qpcr_AB <- df_AB$result %>%
          D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A)
 ```
 
-#Import Depth Data and Add to qpcr_good df
+#Import Abaco Depth Data and add to qpcr data
 ```{r}
 #library(readr)
 sample_data_AB <- readxl::read_xlsx("Data/Sample_data/sample_data.xlsx") %>%
@@ -80,6 +81,7 @@ qpcr_AB_Ofav <- right_join(sample_data_AB, qpcr_AB, by = "Sample.Name", all = TR
 
 ```
 
+#Combine Exumas and Abaco Data
 ```{r}
 Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav)
 ```
@@ -113,7 +115,7 @@ qpcr_prop <- qpcr_copy_num %>%
 ```
 
 
-# Oranizing Raw qPCR Data
+# Oranizing EX/AB qPCR Data
 ```{r}
 # Convert NaN CT values to 0  
 qpcr <- qpcr_prop %>%
@@ -137,7 +139,7 @@ qpcr_data <- qpcr %>%
   
 ```
 
-#Filtering out "bad" data/replicates
+#Filtering out "bad" EX/AB data/replicates
 ```{r}
 #Determing which samples have 2 replicates in the data set 
 dupes <- qpcr_data %>%
@@ -191,7 +193,7 @@ setdiff(reruns$Sample.Name, Ofav_dupes_f2$Sample.Name)
 
 # Convert Clade to Genera names, Convert NA proportions to 0
 ```{r}
-Ofav_symname <- Ofav_good %>%
+EXAB_Ofav <- Ofav_good %>%
    mutate(Symbiodinium = case_when(A.prop > 0 ~ A.prop),
          Breviolum = case_when(B.prop > 0 ~ B.prop),
          Cladocopium = case_when(C.prop > 0 ~ C.prop),
@@ -202,15 +204,37 @@ Ofav_symname <- Ofav_good %>%
           Durusdinium = ifelse(is.na(Durusdinium), 0, Durusdinium)) %>%
   select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
 
-
 ```
 
-# Import Florida Keys Data and combine with Exumas and Abaco Data
+# Import Florida Keys Data
 ```{r}
-KEY_Ofav <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_FL_Keys_2015-2016.xlsx") %>%
-  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium) 
+KEY_Ofav <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx") 
+
+KEY_healthy <- KEY_Ofav %>%
+  filter(condition == "H")
+
+KEY_dupe_tags <- KEY_healthy %>%
+  group_by(tag_number) %>%
+  count(vars = "tag_number") %>%
+  filter(n > 1) 
+
+KEY_tags <- KEY_healthy %>%
+  filter(tag_number %in% KEY_dupe_tags$tag_number) %>%
+  arrange(tag_number)
+
+Keys <- KEY_healthy %>%
+  filter(time_point == "final")
+
+
   
-Ofav<- rbind(Ofav_symname, KEY_Ofav) %>%
+KEY_filter_Ofav <- KEY_Ofav %>% 
+     select(Sample.Name, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium) 
+  
+```
+
+# Combining Exumas, Abacao, Florida Keys & establishing Dominant Symbiont
+```{r}
+Ofav<- rbind(EXAB_Ofav, KEY_filter_Ofav) %>%
   mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
                              ~ "Breviolum",
                              Cladocopium > Breviolum & Cladocopium > Durusdinium & Cladocopium > Symbiodinium
@@ -222,8 +246,8 @@ Ofav<- rbind(Ofav_symname, KEY_Ofav) %>%
   select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym) %>%
   ungroup()
 
-
 ```
+
 
 # Stacked Bar Plot of Symbiont Composition per Sample in order of depth 
 ```{r}
@@ -348,3 +372,28 @@ nn <- graph_from_data_frame(edges, directed = FALSE, vertices = nodes)
 plot(nn, edge.width = E(nn)$weight)
 ```
 
+#Import Curacao Data 
+```{r}
+CUR <- readxl::read_xlsx(path = "Data/Green_Curacao/qpcr_green_curacao_data.xlsx") 
+  
+CUR_Ofav <- GRE %>%
+  select(Sample.Name = sample_name, depth = depth_m, Symbiodinium = A, Breviolum = B, Cladocopium = C, Gerakladium = G)%>%
+  mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Gerakladium & Breviolum > Symbiodinium
+                             ~ "Breviolum",
+                             Cladocopium > Breviolum & Cladocopium > Gerakladium & Cladocopium > Symbiodinium
+                             ~ "Cladocopium",
+                             Gerakladium > Breviolum & Gerakladium > Cladocopium & Gerakladium > Symbiodinium
+                             ~ "Gerakladium",
+                             Symbiodinium > Breviolum & Symbiodinium > Cladocopium & Symbiodinium >
+                             Gerakladium ~ "Symbiodinium"))
+
+CUR_symcomp <- CUR_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Gerakladium) %>%
+  gather(key = "sym", value = "value", -Sample.Name) 
+
+
+ggplot(CUR_symcomp, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
+```

@@ -71,7 +71,7 @@ qpcr_AB <- df_AB$result %>%
          D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A)
 ```
 
-#Import Abaco Depth Data and add to qpcr data
+#Import Abaco Depth Data and add to Abaco qpcr data
 ```{r}
 #library(readr)
 sample_data_AB <- readxl::read_xlsx("Data/Sample_data/sample_data.xlsx") %>%
@@ -113,7 +113,6 @@ qpcr_prop <- qpcr_copy_num %>%
   mutate(A.prop = A.N/total, B.prop = B.N/total, C.prop = C.N/total, D.prop = D.N/total)
    
 ```
-
 
 # Oranizing EX/AB qPCR Data
 ```{r}
@@ -206,35 +205,58 @@ EXAB_Ofav <- Ofav_good %>%
 
 ```
 
+#Import Curacao Data 
+```{r}
+CUR <- readxl::read_xlsx(path = "Data/Green_Curacao/qpcr_green_curacao_data.xlsx") 
+  
+CUR_Ofav <- CUR %>%
+  select(Sample.Name = sample_name, depth = depth_m, Symbiodinium = A, Breviolum = B, Cladocopium = C, Gerakladium = G)%>%
+  mutate("Durusdinium" = 0) %>%
+  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+  
+```
+
 # Import Florida Keys Data
 ```{r}
 KEY_Ofav <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx") 
 
+# Filter out only Healthy samples
 KEY_healthy <- KEY_Ofav %>%
   filter(condition == "H")
 
+# Which Healthy samples have the same tag number
 KEY_dupe_tags <- KEY_healthy %>%
   group_by(tag_number) %>%
   count(vars = "tag_number") %>%
   filter(n > 1) 
 
+# All data for healthy samples with same tag number 
 KEY_tags <- KEY_healthy %>%
   filter(tag_number %in% KEY_dupe_tags$tag_number) %>%
   arrange(tag_number)
 
-Keys <- KEY_healthy %>%
-  filter(time_point == "final")
+# Gather data for figure
+key_both <- KEY_tags %>%
+  select(tag_number, time_point, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = sym, value = value, -tag_number, -time_point)
 
+# Symbiont composition per sample, grouped by final and inital sampling timepoint 
+ggplot(key_both, aes(x = factor(tag_number), y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c')) +
+  facet_wrap(~time_point)
 
-  
-KEY_filter_Ofav <- KEY_Ofav %>% 
+ggsave(filename = "florida_keys.png", width = 350, height = 175, units = "mm")
+
+# Healthy corals in format to combine with other data sets. STILL CONTAINS MULTIPLE TAG # SAMPLES
+KEY_filter_Ofav <- KEY_healthy %>% 
      select(Sample.Name, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium) 
   
 ```
 
 # Combining Exumas, Abacao, Florida Keys & establishing Dominant Symbiont
 ```{r}
-Ofav<- rbind(EXAB_Ofav, KEY_filter_Ofav) %>%
+Ofav<- rbind(EXAB_Ofav, KEY_filter_Ofav, CUR_Ofav) %>%
   mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
                              ~ "Breviolum",
                              Cladocopium > Breviolum & Cladocopium > Durusdinium & Cladocopium > Symbiodinium
@@ -372,28 +394,3 @@ nn <- graph_from_data_frame(edges, directed = FALSE, vertices = nodes)
 plot(nn, edge.width = E(nn)$weight)
 ```
 
-#Import Curacao Data 
-```{r}
-CUR <- readxl::read_xlsx(path = "Data/Green_Curacao/qpcr_green_curacao_data.xlsx") 
-  
-CUR_Ofav <- GRE %>%
-  select(Sample.Name = sample_name, depth = depth_m, Symbiodinium = A, Breviolum = B, Cladocopium = C, Gerakladium = G)%>%
-  mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Gerakladium & Breviolum > Symbiodinium
-                             ~ "Breviolum",
-                             Cladocopium > Breviolum & Cladocopium > Gerakladium & Cladocopium > Symbiodinium
-                             ~ "Cladocopium",
-                             Gerakladium > Breviolum & Gerakladium > Cladocopium & Gerakladium > Symbiodinium
-                             ~ "Gerakladium",
-                             Symbiodinium > Breviolum & Symbiodinium > Cladocopium & Symbiodinium >
-                             Gerakladium ~ "Symbiodinium"))
-
-CUR_symcomp <- CUR_Ofav %>%
-  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Gerakladium) %>%
-  gather(key = "sym", value = "value", -Sample.Name) 
-
-
-ggplot(CUR_symcomp, aes(x = Sample.Name, y = value, fill = sym)) +
-  geom_bar(stat = "identity", position = "fill") +
-  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
-
-```

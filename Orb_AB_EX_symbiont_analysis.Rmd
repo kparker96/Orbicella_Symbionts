@@ -81,26 +81,10 @@ qpcr_AB_Ofav <- right_join(sample_data_AB, qpcr_AB, by = "Sample.Name", all = TR
 
 ```
 
-# Import Baker Data
-```{r}
-MIA1 <- readxl::read_xlsx("Data/qpcr_MIA/MIA1.xlsx") %>%
-  filter(SampleName != NaN) 
-
-qpcr_MIA1_Ofav <- MIA1 %>%
-  filter(Species == "Ofav") %>%
-  select(Sample.Name = SampleName, File.Name, depth = Depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
-  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
-  mutate(A.A = 0) %>%
-  mutate(A.CT.mean = as.numeric(A.CT.mean),
-         B.CT.mean = as.numeric(B.CT.mean),
-         C.CT.mean = as.numeric(C.CT.mean),
-         D.CT.mean = as.numeric(D.CT.mean))
-
-```
 
 #Combine Exumas and Abaco Data
 ```{r}
-Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav, qpcr_MIA1_Ofav)
+Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav)
 ```
 
 # Establishing Ratios
@@ -244,9 +228,75 @@ KEY_Ofav <- KEY %>%
   
 ```
 
+# Import Baker Data
+```{r}
+MIA1 <- readxl::read_xlsx("Data/qpcr_MIA/MIA1.xlsx") %>%
+  filter(SampleName != NaN) 
+
+MIA2 <- readxl::read_xlsx("Data/qpcr_MIA/MIA2.xlsx") %>%
+  filter(SampleName != NaN) 
+
+MIA3 <- readxl::read_xlsx("Data/qpcr_MIA/MIA3.xlsx") %>%
+  filter(Sample.Name != NaN)
+
+MIA1_Ofav <- MIA1 %>%
+  filter(Species == "Ofav") %>%
+  select(Sample.Name = SampleName, depth = depth_m, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
+  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
+  mutate(A.CT.mean = as.numeric(A.CT.mean),
+         B.CT.mean = as.numeric(B.CT.mean),
+         C.CT.mean = as.numeric(C.CT.mean),
+         D.CT.mean = as.numeric(D.CT.mean))
+
+MIA2_Ofav <- MIA2 %>% 
+ filter(Species == "Ofav") %>%
+  select(Sample.Name = SampleName, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
+  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
+  mutate(A.CT.mean = as.numeric(A.CT.mean),
+         B.CT.mean = as.numeric(B.CT.mean),
+         C.CT.mean = as.numeric(C.CT.mean),
+         D.CT.mean = as.numeric(D.CT.mean)) %>%
+  mutate(depth = NaN)
+
+MIA3_Ofav <- MIA3 %>%
+  filter(Species == "OFAV") %>%
+  select(Sample.Name, A.CT.mean, depth = depth_m, B.CT.mean, C.CT.mean, D.CT.mean,
+  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
+   mutate(A.CT.mean = as.numeric(A.CT.mean),
+         B.CT.mean = as.numeric(B.CT.mean),
+         C.CT.mean = as.numeric(C.CT.mean),
+         D.CT.mean = as.numeric(D.CT.mean))
+  
+qpcr_MIA_Ofav <- rbind(MIA1_Ofav, MIA2_Ofav, MIA3_Ofav) %>%
+  filter(A.reps != 1, B.reps != 1, C.reps != 1, D.reps != 1)
+
+
+# adjust CT to form ratio of Symbiont divided by Copy # (Currently a Placeholder #)
+MIA_copy_num <- qpcr_MIA_Ofav %>%
+  mutate(N = 15) %>%
+  mutate(A.N = 2^(N - A.CT.mean)/1,
+         B.N = 2^(N - B.CT.mean)/1,
+         C.N = 2^(N - C.CT.mean)/1,
+         D.N = 2^(N - D.CT.mean)/1)
+
+MIA_qpcr_prop <- MIA_copy_num %>%
+  mutate(A.N = ifelse(is.na(A.N), 0, A.N),
+         B.N = ifelse(is.na(B.N), 0, B.N),
+         C.N = ifelse(is.na(C.N), 0, C.N),
+         D.N = ifelse(is.na(D.N), 0, D.N)) %>%
+  rowwise() %>%
+  mutate(total = sum(A.N + B.N + C.N + D.N))%>%
+  mutate(A.prop = A.N/total, B.prop = B.N/total, C.prop = C.N/total, D.prop = D.N/total)
+
+MIA_Ofav <- MIA_qpcr_prop %>%
+  select(Sample.Name, depth, Symbiodinium = A.prop, Breviolum = B.prop, Cladocopium = C.prop, Durusdinium = D.prop) %>%
+  mutate(depth = NA)
+
+```
+
 # Combining Exumas, Abacao, Florida Keys & establishing Dominant Symbiont
 ```{r}
-Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav) %>%
+Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav) %>%
   mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
                              ~ "Breviolum",
                              Cladocopium > Breviolum & Cladocopium > Durusdinium & Cladocopium > Symbiodinium
@@ -261,7 +311,7 @@ Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav) %>%
 ```
 
 
-# Stacked Bar Plot of Symbiont Composition per Sample in order of depth 
+# Stacked Bar Plot of Symbiont Composition per Sample  
 ```{r}
 a <- Ofav %>%
   select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%

@@ -81,16 +81,33 @@ qpcr_AB_Ofav <- right_join(sample_data_AB, qpcr_AB, by = "Sample.Name", all = TR
 
 ```
 
+# Import Baker Data
+```{r}
+MIA1 <- readxl::read_xlsx("Data/qpcr_MIA/MIA1.xlsx") %>%
+  filter(SampleName != NaN) 
+
+qpcr_MIA1_Ofav <- MIA1 %>%
+  filter(Species == "Ofav") %>%
+  select(Sample.Name = SampleName, File.Name, depth = Depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
+  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
+  mutate(A.A = 0) %>%
+  mutate(A.CT.mean = as.numeric(A.CT.mean),
+         B.CT.mean = as.numeric(B.CT.mean),
+         C.CT.mean = as.numeric(C.CT.mean),
+         D.CT.mean = as.numeric(D.CT.mean))
+
+```
+
 #Combine Exumas and Abaco Data
 ```{r}
-Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav)
+Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav, qpcr_MIA1_Ofav)
 ```
 
 # Establishing Ratios
 ```{r}
 # adjust CT for flouresence 
-qpcr_flor <-Ofav_qpcr %>%
-  mutate(A.CT.mean = A.CT.mean - 1, 
+qpcr_flor <- Ofav_qpcr %>%
+  mutate(A.CT.mean = A.CT.mean - 1,
          B.CT.mean = B.CT.mean - 1,
          C.CT.mean = C.CT.mean - 1,
          D.CT.mean = D.CT.mean - 1)
@@ -218,45 +235,18 @@ CUR_Ofav <- CUR %>%
 
 # Import Florida Keys Data
 ```{r}
-KEY_Ofav <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx") 
+KEY <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx") 
 
-# Filter out only Healthy samples
-KEY_healthy <- KEY_Ofav %>%
-  filter(condition == "H")
-
-# Which Healthy samples have the same tag number
-KEY_dupe_tags <- KEY_healthy %>%
-  group_by(tag_number) %>%
-  count(vars = "tag_number") %>%
-  filter(n > 1) 
-
-# All data for healthy samples with same tag number 
-KEY_tags <- KEY_healthy %>%
-  filter(tag_number %in% KEY_dupe_tags$tag_number) %>%
-  arrange(tag_number)
-
-# Gather data for figure
-key_both <- KEY_tags %>%
-  select(tag_number, time_point, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
-  gather(key = sym, value = value, -tag_number, -time_point)
-
-# Symbiont composition per sample, grouped by final and inital sampling timepoint 
-ggplot(key_both, aes(x = factor(tag_number), y = value, fill = sym)) +
-  geom_bar(stat = "identity", position = "fill") +
-  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c')) +
-  facet_wrap(~time_point)
-
-ggsave(filename = "florida_keys.png", width = 350, height = 175, units = "mm")
-
-# Healthy corals in format to combine with other data sets. STILL CONTAINS MULTIPLE TAG # SAMPLES
-KEY_filter_Ofav <- KEY_healthy %>% 
-     select(Sample.Name, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium) 
+KEY_Ofav <- KEY %>%
+  filter(condition == "H") %>%
+  filter(time_point == "initial") %>%
+  select(Sample.Name, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
   
 ```
 
 # Combining Exumas, Abacao, Florida Keys & establishing Dominant Symbiont
 ```{r}
-Ofav<- rbind(EXAB_Ofav, KEY_filter_Ofav, CUR_Ofav) %>%
+Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav) %>%
   mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
                              ~ "Breviolum",
                              Cladocopium > Breviolum & Cladocopium > Durusdinium & Cladocopium > Symbiodinium

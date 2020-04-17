@@ -1,0 +1,75 @@
+Block Type	96-Well 0.1-mL Block																														
+Calibration Background is expired 	No																														
+Calibration Background performed on	03-02-2017																														
+Calibration Pure Dye ABY is expired	No																														
+Calibration Pure Dye ABY performed on	03-02-2017																														
+Calibration Pure Dye FAM is expired	No																														
+Calibration Pure Dye FAM performed on	03-02-2017																														
+Calibration Pure Dye JUN is expired	No																														
+Calibration Pure Dye JUN performed on	03-02-2017																														
+Calibration Pure Dye NED is expired	No																														
+Calibration Pure Dye NED performed on	03-02-2017																														
+Calibration Pure Dye ROX is expired	No																														
+Calibration Pure Dye ROX performed on	03-02-2017																														
+Calibration Pure Dye SYBR is expired	No																														
+Calibration Pure Dye SYBR performed on	03-02-2017																														
+Calibration Pure Dye TAMRA is expired	No																														
+Calibration Pure Dye TAMRA performed on	03-02-2017																														
+Calibration Pure Dye VIC is expired	No																														
+Calibration Pure Dye VIC performed on	03-02-2017																														
+Calibration ROI is expired 	No																														
+Calibration ROI performed on	03-02-2017																														
+Calibration Uniformity is expired 	No																														
+Calibration Uniformity performed on	03-02-2017																														
+Chemistry	TAQMAN																														
+Date Created	2019-03-01 08:39:02 AM PST																														
+Experiment Barcode																															
+Experiment Comment																															
+Experiment File Name	D:\Users\INSTR-ADMIN\experiments\Daisy\DB_emerald_plate6_2019-02-28.eds																														
+Experiment Name	DB_emerald_plate6_2019-02-28																														
+Experiment Run End Time	2019-02-28 15:08:31 PM PST																														
+Experiment Type	Standard Curve																														
+Instrument Name	      172310454																														
+Instrument Serial Number	172310454																														
+Instrument Type	QuantStudio™ 3 System																														
+Passive Reference	ROX																														
+Post-read Stage/Step																															
+Pre-read Stage/Step																															
+Quantification Cycle Method	Ct																														
+Signal Smoothing On	true																														
+Stage/ Cycle where Ct Analysis is performed	Stage2, Step2																														
+User Name																															
+																															
+Well	Well Position	Omit	Sample Name	Target Name	Task	Reporter	Quencher	CT	Ct Mean	Ct SD	Quantity	Quantity Mean	Quantity SD	Y-Intercept	R(superscript 2)	Slope	Efficiency	Automatic Ct Threshold	Ct Threshold	Automatic Baseline	Baseline Start	Baseline End	Amp Status	Comments	Cq Conf	CQCONF	EXPFAIL	PRFLOW	HIGHSD	NOAMP	THOLDFAIL
+61	F1	FALSE	ofav129	A	UNKNOWN	FAM	NFQ-MGB	29.965	29.354	0.865								FALSE	0.020	TRUE	3	28	Amp		0.883	N	N	N	Y	N	N
+62	F2	FALSE	ofav129	A	UNKNOWN	FAM	NFQ-MGB	28.743	29.354	0.865								FALSE	0.020	TRUE	3	27	Amp		0.755	Y	N	N	Y	N	N
+63	F3	FALSE	ofav129	B	UNKNOWN	FAM	NFQ-MGB	35.086	35.913	1.170								TRUE	0.085	TRUE	3	31	Amp		0.885	N	N	N	Y	N	N
+64	F4	FALSE	ofav129	B	UNKNOWN	FAM	NFQ-MGB	36.740	35.913	1.170								TRUE	0.085	TRUE	3	32	Amp		0.846	N	N	N	Y	N	N
+65	F5	FALSE	ofav129	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										TRUE	0.040	TRUE	3	39	No Amp		0.000	Y	Y	N	N	N	Y
+65	F5	FALSE	ofav129	D	UNKNOWN	FAM	NFQ-MGB	25.676	25.691	0.021								TRUE	0.195	TRUE	3	20	Amp		0.943	N	N	N	N	N	N
+66	F6	FALSE	ofav129	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										TRUE	0.040	TRUE	3	39	No Amp		0.000	Y	Y	N	N	N	Y
+66	F6	FALSE	ofav129	D	UNKNOWN	FAM	NFQ-MGB	25.706	25.691	0.021								TRUE	0.195	TRUE	3	21	Amp		0.957	N	N	N	N	N	N
+13	B1	FALSE	ofav91	A	UNKNOWN	FAM	NFQ-MGB	34.189	34.189									FALSE	0.020	TRUE	3	32	Amp		0.822	N	N	N	N	N	
+14	B2	FALSE	ofav91	A	UNKNOWN	FAM	NFQ-MGB	Undetermined	34.189									FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N	Y	
+15	B3	FALSE	ofav91	B	UNKNOWN	FAM	NFQ-MGB	29.544	29.156	0.549								TRUE	0.102	TRUE	3	25	Amp		0.946	N	N	N	Y	N	
+16	B4	FALSE	ofav91	B	UNKNOWN	FAM	NFQ-MGB	28.768	29.156	0.549								TRUE	0.102	TRUE	3	24	Amp		0.953	N	N	N	Y	N	
+17	B5	FALSE	ofav91	C	UNKNOWN	VIC	NFQ-MGB	39.170	39.170									TRUE	0.040	TRUE	3	35	Inconclusive		0.000	Y	N	Y	N	N	
+17	B5	FALSE	ofav91	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										TRUE	0.103	TRUE	3	39	No Amp		0.000	Y	Y	N	N	Y	
+18	B6	FALSE	ofav91	C	UNKNOWN	VIC	NFQ-MGB	Undetermined	39.170									TRUE	0.040	TRUE	3	39	No Amp		0.000	Y	Y	Y	N	N	
+18	B6	FALSE	ofav91	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										TRUE	0.103	TRUE	3	39	No Amp		0.000	Y	Y	N	N	Y	
+19	B7	FALSE	ofav65	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N	Y	
+20	B8	FALSE	ofav65	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N	Y	
+21	B9	FALSE	ofav65	B	UNKNOWN	FAM	NFQ-MGB	32.055	31.814	0.340								TRUE	0.102	TRUE	3	27	Amp		0.942	N	N	N	N	N	
+22	B10	FALSE	ofav65	B	UNKNOWN	FAM	NFQ-MGB	31.574	31.814	0.340								TRUE	0.102	TRUE	3	27	Amp		0.944	N	N	N	N	N	
+23	B11	FALSE	ofav65	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										TRUE	0.040	TRUE	3	39	No Amp		0.000	Y	Y	Y	N	N	
+23	B11	FALSE	ofav65	D	UNKNOWN	FAM	NFQ-MGB	35.996	35.988	0.012								TRUE	0.103	TRUE	3	32	Amp		0.883	N	N	N	N	N	
+24	B12	FALSE	ofav65	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										TRUE	0.040	TRUE	3	39	No Amp		0.000	Y	Y	Y	N	N	
+24	B12	FALSE	ofav65	D	UNKNOWN	FAM	NFQ-MGB	35.979	35.988	0.012								TRUE	0.103	TRUE	3	31	Amp		0.837	N	N	N	N	N	
+37	D1	FALSE	ofav62	A	UNKNOWN	FAM	NFQ-MGB	32.873	33.012	0.195								FALSE	0.020	TRUE	3	30	Amp		0.895	N	N	N	N	N	
+38	D2	FALSE	ofav62	A	UNKNOWN	FAM	NFQ-MGB	33.150	33.012	0.195								FALSE	0.020	TRUE	3	31	Amp		0.888	N	N	N	N	N	
+39	D3	FALSE	ofav62	B	UNKNOWN	FAM	NFQ-MGB	29.097	29.009	0.126								TRUE	0.102	TRUE	3	24	Amp		0.939	N	N	N	N	N	
+40	D4	FALSE	ofav62	B	UNKNOWN	FAM	NFQ-MGB	28.920	29.009	0.126								TRUE	0.102	TRUE	3	24	Amp		0.959	N	N	N	N	N	
+41	D5	FALSE	ofav62	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										TRUE	0.040	TRUE	3	39	No Amp		0.000	Y	Y	Y	N	N	
+41	D5	FALSE	ofav62	D	UNKNOWN	FAM	NFQ-MGB	33.768	34.463	0.983								TRUE	0.103	TRUE	3	29	Amp		0.913	N	N	N	Y	N	
+42	D6	FALSE	ofav62	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										TRUE	0.040	TRUE	3	39	No Amp		0.000	Y	Y	Y	N	N	
+42	D6	FALSE	ofav62	D	UNKNOWN	FAM	NFQ-MGB	35.158	34.463	0.983								TRUE	0.103	TRUE	3	30	Amp		0.885	N	N	N	Y	N	

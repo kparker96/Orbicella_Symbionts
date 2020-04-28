@@ -16,6 +16,14 @@ library(tidyverse) # (install.packages("tidyverse")
 ```
 
 
+# Key
+# AB <- Abaco
+# EX <- Exumas
+# KEY <- Florida Keys (Manzello)
+# ADD <- Additional Manzello Data 
+# MIA <- Miami(Baker Lab)
+# CUR <- Curaco 
+
 #Importing Raw Exumas qPCR Data from Quant Studio Design and Analysis Software 
 ```{r}
 # List Exuma symbiodinium data files
@@ -81,7 +89,7 @@ qpcr_AB_Ofav <- right_join(sample_data_AB, qpcr_AB, by = "Sample.Name", all = TR
 
 ```
 
-
+# Import Additional Manzello Data 
 ```{r}
 plates_ADD <- list.files(path = "Data/qPCR_ADD", pattern = ".txt", full.names = TRUE)
 
@@ -102,7 +110,7 @@ qpcr_ADD_Ofav <- qpcr_ADD %>%
 ```
 
 
-#Combine Exumas and Abaco Data
+#Combine Exumas, Abaco, and Additional Manzello Data
 ```{r}
 Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav, qpcr_ADD_Ofav)
 ```
@@ -241,11 +249,78 @@ CUR_Ofav <- CUR %>%
 ```{r}
 KEY <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx") 
 
-KEY_Ofav <- KEY %>%
-  filter(condition == "H") %>%
+KEY_fig_dat <- KEY %>%
+  select(Sample.Name, time_point, condition, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = sym, value = value, -Sample.Name, -time_point, -condition)
+
+ggplot(KEY_fig_dat, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_wrap(~time_point) +
+  facet_wrap(~condition) +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c')) 
+
+initial <- KEY_fig_dat %>%
   filter(time_point == "initial") %>%
+  filter(condition == "H" | condition == "B" | condition == "PB" | condition == "P")
+
+i <- ggplot(initial, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_grid(~condition, space = "free", scales = "free") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c')) +
+  ggtitle("Initial") +
+  theme(legend.position = "none")
+
+final <- KEY_fig_dat %>%
+  filter(time_point == "final") %>%
+  filter(condition == "H" | condition == "B" | condition == "PB" | condition == "P")
+
+f <- ggplot(final, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_grid(~condition, space = "free", scales = "free") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c')) +
+  ggtitle("Final")
+
+library(ggpubr) 
+ggarrange(i,f)
+ggsave(filename = "all_KEYS.png", width = 300, height = 150, units = "mm")
+
+
+KEY_healthy <- KEY %>%
+  filter(condition == "H")
+
+KEY_H_dupes <- KEY_healthy %>%
+  group_by(tag_number) %>%
+  count(vars = "tag_number") %>%
+  filter(n > 1) 
+
+#Gathering the full data for samples with 2 replicates
+KEY_dupes_dat <- KEY_healthy %>%
+  filter(tag_number %in% KEY_H_dupes$tag_number) %>%
+  arrange(tag_number)
+
+KEY_dupes_initial <- KEY_dupes_dat %>%
+  filter(time_point == "initial")
+
+KEY_H_single <- KEY_healthy %>%
+  filter(!(Sample.Name %in% KEY_dupes_dat$Sample.Name))
+
+KEY_Ofav <- rbind(KEY_dupes_initial, KEY_H_single) %>%
   select(Sample.Name, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
-  
+
+
+KEY_Samps <- KEY_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = sym, value = value, -Sample.Name)
+
+ggplot(KEY_Samps, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c')) +
+  theme(legend.position = "bottom")
+
+ ggsave(filename = "healthy_KEYS.png", width = 84, height = 100, units = "mm")
+
+
+
 ```
 
 # Import Baker Data
@@ -313,10 +388,6 @@ MIA_Ofav <- MIA_qpcr_prop %>%
   mutate(depth = NA)
 
 ```
-
-
-
-
 
 
 # Combining Exumas, Abacao, Florida Keys & establishing Dominant Symbiont
@@ -391,6 +462,8 @@ ggplot(b, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
 # 2. What is the probability of Symbiont Combinations
 
 ```{r}
+library(igraph)
+
 Ofav_mix <- Ofav %>%
   filter(Symbiodinium != 1 & Breviolum != 1 & Cladocopium != 1 & Durusdinium != 1)
 
@@ -427,6 +500,17 @@ plot(net_orb, edge.curved = 0,
      vertex.color = ifelse(grepl(".*um", names(V(net_orb))), 
                            c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
                            colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(net_orb)$depth,breaks = 100))]))
+```
+
+
+
+```{r}
+net_master <- verts_orb %>%
+  select(Sample.Name = id, depth, lab) %>%
+  right_join(edges_orb)
+
+
+
 ```
 
 ```{r}

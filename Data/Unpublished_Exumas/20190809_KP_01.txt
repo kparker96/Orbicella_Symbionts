@@ -1,0 +1,139 @@
+* Block Type = 96-Well 0.2-mL Block
+* Calibration Background is expired  = No
+* Calibration Background performed on = 09-24-2018
+* Calibration Pure Dye ABY is expired = No
+* Calibration Pure Dye ABY performed on = 09-24-2018
+* Calibration Pure Dye FAM is expired = No
+* Calibration Pure Dye FAM performed on = 09-24-2018
+* Calibration Pure Dye JUN is expired = No
+* Calibration Pure Dye JUN performed on = 09-24-2018
+* Calibration Pure Dye NED is expired = No
+* Calibration Pure Dye NED performed on = 09-24-2018
+* Calibration Pure Dye ROX is expired = No
+* Calibration Pure Dye ROX performed on = 09-24-2018
+* Calibration Pure Dye SYBR is expired = No
+* Calibration Pure Dye SYBR performed on = 09-24-2018
+* Calibration Pure Dye TAMRA is expired = No
+* Calibration Pure Dye TAMRA performed on = 09-24-2018
+* Calibration Pure Dye VIC is expired = No
+* Calibration Pure Dye VIC performed on = 09-24-2018
+* Calibration ROI is expired  = No
+* Calibration ROI performed on = 09-24-2018
+* Calibration Uniformity is expired  = No
+* Calibration Uniformity performed on = 09-24-2018
+* Chemistry = SYBR_GREEN
+* Date Created = 2019-08-09 13:02:49 PM CDT
+* Experiment Barcode = NA
+* Experiment Comment = NA
+* Experiment File Name = E:\Power Up SYBR_29.eds
+* Experiment Name = Power_UP_SYBR
+* Experiment Run End Time = 2019-08-09 10:36:55 AM CDT
+* Experiment Type = Standard Curve
+* Instrument Name =       272320406
+* Instrument Serial Number = 272320406
+* Instrument Type = QuantStudio™ 3 System
+* Passive Reference = ROX
+* Post-read Stage/Step = 
+* Pre-read Stage/Step = 
+* Quantification Cycle Method = Ct
+* Signal Smoothing On = true
+* Stage where Melt Analysis is performed = Stage3
+* Stage/ Cycle where Ct Analysis is performed = Stage2, Step2
+* User Name = NA
+
+[Results]
+Well	Well Position	Omit	Sample Name	Target Name	Task	Reporter	Quencher	CT	Ct Mean	Ct SD	Quantity	Quantity Mean	Quantity SD	Y-Intercept	R(superscript 2)	Slope	Efficiency	Automatic Ct Threshold	Ct Threshold	Automatic Baseline	Baseline Start	Baseline End	Amp Status	Comments	Cq Conf	CQCONF	EXPFAIL	HIGHSD	NOAMP	Tm1	Tm2	Tm3	Tm4
+2	A2	false	EX0233	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	32	No Amp		0.000	Y	N	N	Y				
+3	A3	false	EX0238	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	14	No Amp		0.000	Y	N	N	Y				
+4	A4	false	EX0239	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+5	A5	false	EX0240	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	8	No Amp		0.000	Y	N	N	N				
+7	A7	false	EX0243	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+8	A8	false	EX0244	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+9	A9	false	EX0246	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	N				
+10	A10	false	EX0249	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+11	A11	false	PTC	A	UNKNOWN	FAM	NFQ-MGB	29.169	28.996	0.245								false	0.010	true	3	27	Amp		0.286	Y	N	N	N				
+12	A12	false	NTC	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	22	No Amp		0.000	Y	N	N	Y				
+13	B1	false	EX0232	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+14	B2	false	EX0233	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	12	No Amp		0.000	Y	N	N	N				
+15	B3	false	EX0238	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+16	B4	false	EX0239	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	N				
+17	B5	false	EX0240	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	N				
+18	B6	false	EX0242	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+19	B7	false	EX0243	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	N				
+20	B8	false	EX0244	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+21	B9	false	EX0246	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	N				
+22	B10	false	EX0249	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	9	No Amp		0.000	Y	N	N	Y				
+23	B11	false	PTC	A	UNKNOWN	FAM	NFQ-MGB	28.822	28.996	0.245								false	0.010	true	3	28	Amp		0.215	Y	N	N	N				
+24	B12	false	NTC	A	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	30	No Amp		0.000	Y	N	N	Y				
+25	C1	false	EX0232	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	N				
+26	C2	false	EX0233	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+27	C3	false	EX0238	B	UNKNOWN	FAM	NFQ-MGB	29.914	29.729	0.261								false	0.010	true	3	27	Amp		0.925	N	N	N	N				
+28	C4	false	EX0239	B	UNKNOWN	FAM	NFQ-MGB	31.797	31.566	0.327								false	0.010	true	3	30	Amp		0.866	N	N	N	N				
+29	C5	false	EX0240	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+30	C6	false	EX0242	B	UNKNOWN	FAM	NFQ-MGB	31.628	31.567	0.087								false	0.010	true	3	30	Amp		0.899	N	N	N	N				
+31	C7	false	EX0243	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+32	C8	false	EX0244	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+33	C9	false	EX0246	B	UNKNOWN	FAM	NFQ-MGB	31.062	30.734	0.463								false	0.010	true	3	29	Amp		0.903	N	N	N	N				
+34	C10	false	EX0249	B	UNKNOWN	FAM	NFQ-MGB	Undetermined	38.733									false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+35	C11	false	PTC	B	UNKNOWN	FAM	NFQ-MGB	34.253	33.259	1.406								false	0.010	true	3	31	Amp		0.821	N	N	Y	N				
+36	C12	false	NTC	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+37	D1	false	EX0232	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+38	D2	false	EX0233	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+39	D3	false	EX0238	B	UNKNOWN	FAM	NFQ-MGB	29.545	29.729	0.261								false	0.010	true	3	27	Amp		0.923	N	N	N	N				
+40	D4	false	EX0239	B	UNKNOWN	FAM	NFQ-MGB	31.335	31.566	0.327								false	0.010	true	3	31	Amp		0.870	N	N	N	N				
+41	D5	false	EX0240	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+42	D6	false	EX0242	B	UNKNOWN	FAM	NFQ-MGB	31.506	31.567	0.087								false	0.010	true	3	31	Amp		0.926	N	N	N	N				
+43	D7	false	EX0243	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+44	D8	false	EX0244	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+45	D9	false	EX0246	B	UNKNOWN	FAM	NFQ-MGB	30.407	30.734	0.463								false	0.010	true	3	29	Amp		0.910	N	N	N	N				
+46	D10	false	EX0249	B	UNKNOWN	FAM	NFQ-MGB	38.733	38.733									false	0.010	true	3	39	No Amp		0.045	Y	Y	N	N				
+47	D11	false	PTC	B	UNKNOWN	FAM	NFQ-MGB	32.265	33.259	1.406								false	0.010	true	3	31	Amp		0.889	N	N	Y	N				
+48	D12	false	NTC	B	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+49	E1	false	EX0232	C	UNKNOWN	VIC	NFQ-MGB	27.876	27.665	0.298								false	0.010	true	3	26	Amp		0.940	N	N	N	N				
+49	E1	false	EX0232	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+50	E2	false	EX0233	C	UNKNOWN	VIC	NFQ-MGB	25.877	25.895	0.026								false	0.010	true	3	25	Amp		0.929	N	N	N	N				
+50	E2	false	EX0233	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	28	No Amp		0.000	Y	N	N	Y				
+51	E3	false	EX0238	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+51	E3	false	EX0238	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+52	E4	false	EX0239	C	UNKNOWN	VIC	NFQ-MGB	35.618	35.618									false	0.010	true	3	34	Amp		0.826	N	N	N	N				
+52	E4	false	EX0239	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+53	E5	false	EX0240	C	UNKNOWN	VIC	NFQ-MGB	25.689	25.416	0.386								false	0.010	true	3	24	Amp		0.925	N	N	N	N				
+53	E5	false	EX0240	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	N				
+54	E6	false	EX0242	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+54	E6	false	EX0242	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+55	E7	false	EX0243	C	UNKNOWN	VIC	NFQ-MGB	24.465	24.345	0.170								false	0.010	true	3	23	Amp		0.927	N	N	N	N				
+55	E7	false	EX0243	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	N				
+56	E8	false	EX0244	C	UNKNOWN	VIC	NFQ-MGB	24.449	24.443	0.008								false	0.010	true	3	23	Amp		0.936	N	N	N	N				
+56	E8	false	EX0244	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+57	E9	false	EX0246	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+57	E9	false	EX0246	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+58	E10	false	EX0249	C	UNKNOWN	VIC	NFQ-MGB	24.182	23.996	0.263								false	0.010	true	3	23	Amp		0.938	N	N	N	N				
+58	E10	false	EX0249	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+59	E11	false	PTC	C	UNKNOWN	VIC	NFQ-MGB	31.132	31.458	0.461								false	0.010	true	3	30	Amp		0.878	N	N	N	N				
+59	E11	false	PTC	D	UNKNOWN	FAM	NFQ-MGB	28.208	28.450	0.342								false	0.010	true	3	27	Amp		0.459	Y	N	N	N				
+60	E12	false	NTC	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+60	E12	false	NTC	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+61	F1	false	EX0232	C	UNKNOWN	VIC	NFQ-MGB	27.454	27.665	0.298								false	0.010	true	3	26	Amp		0.925	N	N	N	N				
+61	F1	false	EX0232	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+62	F2	false	EX0233	C	UNKNOWN	VIC	NFQ-MGB	25.913	25.895	0.026								false	0.010	true	3	25	Amp		0.936	N	N	N	N				
+62	F2	false	EX0233	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	35	No Amp		0.000	Y	N	N	Y				
+63	F3	false	EX0238	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+63	F3	false	EX0238	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	34	No Amp		0.000	Y	N	N	Y				
+64	F4	false	EX0239	C	UNKNOWN	VIC	NFQ-MGB	Undetermined	35.618									false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+64	F4	false	EX0239	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+65	F5	false	EX0240	C	UNKNOWN	VIC	NFQ-MGB	25.144	25.416	0.386								false	0.010	true	3	24	Amp		0.940	N	N	N	N				
+65	F5	false	EX0240	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+66	F6	false	EX0242	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+66	F6	false	EX0242	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+67	F7	false	EX0243	C	UNKNOWN	VIC	NFQ-MGB	24.225	24.345	0.170								false	0.010	true	3	23	Amp		0.927	N	N	N	N				
+67	F7	false	EX0243	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+68	F8	false	EX0244	C	UNKNOWN	VIC	NFQ-MGB	24.438	24.443	0.008								false	0.010	true	3	23	Amp		0.930	N	N	N	N				
+68	F8	false	EX0244	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+69	F9	false	EX0246	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+69	F9	false	EX0246	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+70	F10	false	EX0249	C	UNKNOWN	VIC	NFQ-MGB	23.809	23.996	0.263								false	0.010	true	3	22	Amp		0.915	N	N	N	N				
+70	F10	false	EX0249	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	31	No Amp		0.000	Y	N	N	Y				
+71	F11	false	PTC	C	UNKNOWN	VIC	NFQ-MGB	31.784	31.458	0.461								false	0.010	true	3	31	Amp		0.874	N	N	N	N				
+71	F11	false	PTC	D	UNKNOWN	FAM	NFQ-MGB	28.692	28.450	0.342								false	0.010	true	3	27	Amp		0.444	Y	N	N	N				
+72	F12	false	NTC	C	UNKNOWN	VIC	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				
+72	F12	false	NTC	D	UNKNOWN	FAM	NFQ-MGB	Undetermined										false	0.010	true	3	39	No Amp		0.000	Y	Y	N	Y				

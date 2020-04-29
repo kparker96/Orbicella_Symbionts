@@ -15,19 +15,17 @@ library(steponeR) # install_github("jrcunning/steponeR")
 library(tidyverse) # (install.packages("tidyverse")
 ```
 
-
-# Key
-# AB <- Abaco
-# EX <- Exumas
-# KEY <- Florida Keys (Manzello)
-# ADD <- Additional Manzello Data 
-# MIA <- Miami(Baker Lab)
-# CUR <- Curaco 
+# Data Key
+# AB  <- Parker_Abaco_2019
+# EX  <- Unpublished_Exumas
+# KEY <- Manzello_Florida_Keys_2019
+# MIA <- Karp_Miami_Unpublished
+# CUR <- Green_Curaco_2014 
 
 #Importing Raw Exumas qPCR Data from Quant Studio Design and Analysis Software 
 ```{r}
 # List Exuma symbiodinium data files
-plates_EX <- list.files(path = "Data/qPCR_EX", pattern = ".txt", full.names = TRUE)
+plates_EX <- list.files(path = "Data/Unpublished_Exumas", pattern = ".txt", full.names = TRUE)
 
 # Read in data and calculate target ratios
 df_EX <- steponeR(files = plates_EX,
@@ -41,15 +39,15 @@ qpcr_EX <- df_EX$result
 
 ```
 
-#Filtering out other species from EX Raw qPCR data
+#Importing Exumas Sample Data and filtering out other species from Exumas raw qPCR data
 ```{r}
 # Import Sample Data 
 library(readr)
 
-raw_sample_data <- readxl::read_xlsx("Data/Sample_data/Ex_Sample_Data.xlsx")
+raw_sample_data_EX <- readxl::read_xlsx("Data/Unpublished_Exumas/sample_data_Exumas.xlsx")
 
 #renaming  colomns of sample data to match qpcr data
-sample_data_EX <- raw_sample_data %>%
+sample_data_EX <- raw_sample_data_EX %>%
   select(Sample.Name = sample_id, site, genus, species, depth = colony_depth_m, range)
 
 # Joining sample data with qpcr data and removing NA samples
@@ -61,10 +59,9 @@ qpcr_EX_Ofav <- EX_Ofav %>%
          D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A)
 ```
 
-
 #Importing Raw Abaco qPCR Data from Quant Studio Design and Analysis Software 
 ```{r}
-plates_AB <- list.files(path = "Data/qPCR_AB", pattern = ".txt", full.names = TRUE)
+plates_AB <- list.files(path = "Data/Parker_Abaco_2019", pattern = ".txt", full.names = TRUE)
 
 # Read in data and calculate target ratios
 df_AB <- steponeR(files = plates_AB, 
@@ -82,40 +79,19 @@ qpcr_AB <- df_AB$result %>%
 #Import Abaco Depth Data and add to Abaco qpcr data
 ```{r}
 #library(readr)
-sample_data_AB <- readxl::read_xlsx("Data/Sample_data/sample_data.xlsx") %>%
+sample_data_AB <- readxl::read_xlsx("Data/Parker_Abaco_2019/sample_data_Abaco.xlsx") %>%
   select(Sample.Name = tube_label, depth = colony_depth_m)
 
 qpcr_AB_Ofav <- right_join(sample_data_AB, qpcr_AB, by = "Sample.Name", all = TRUE)
 
 ```
 
-# Import Additional Manzello Data 
+#Combine Exumas and Abaco
 ```{r}
-plates_ADD <- list.files(path = "Data/qPCR_ADD", pattern = ".txt", full.names = TRUE)
-
-
-df_ADD <- steponeR(files = plates_ADD,
-               delim = "\t", 
-               target.ratios = "A.A", 
-               fluor.norm = list(C = 2.234, D = 1, A = 1, B = 1),
-               copy.number = list(C = 20, D = 3, A = 1, B = 1),
-               ploidy = list(C = 1, D = 1, A = 1, B = 1),
-               extract = list(C = 0.813, D = 0.813, A = 0.813, B = 0.813))
-qpcr_ADD <- df_ADD$result
-
-qpcr_ADD_Ofav <- qpcr_ADD %>%
-  select(Sample.Name, File.Name, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd, B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A) %>%
-  mutate(depth = NA)
-
+Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav)
 ```
 
-
-#Combine Exumas, Abaco, and Additional Manzello Data
-```{r}
-Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav, qpcr_ADD_Ofav)
-```
-
-# Establishing Ratios
+# Establishing Ratios for Exumas and Abaco Data
 ```{r}
 # adjust CT for flouresence 
 qpcr_flor <- Ofav_qpcr %>%
@@ -143,7 +119,7 @@ qpcr_prop <- qpcr_copy_num %>%
    
 ```
 
-# Oranizing EX/AB qPCR Data
+# Organizing Exumas/Abaco qPCR Data
 ```{r}
 # Convert NaN CT values to 0  
 qpcr <- qpcr_prop %>%
@@ -167,7 +143,7 @@ qpcr_data <- qpcr %>%
   
 ```
 
-#Filtering out "bad" EX/AB data/replicates
+#Filtering out "bad" Exumas/Abaco data/replicates
 ```{r}
 #Determing which samples have 2 replicates in the data set 
 dupes <- qpcr_data %>%
@@ -234,10 +210,10 @@ EXAB_Ofav <- Ofav_good %>%
 
 ```
 
-#Import Curacao Data 
+#Import Green Curacao 2014 Data 
 ```{r}
-CUR <- readxl::read_xlsx(path = "Data/Green_Curacao/qpcr_green_curacao_data.xlsx") 
-  
+CUR <- readxl::read_xlsx(path = "Data/Green_Curacao_2014/qpcr_green_curacao_data.xlsx") 
+
 CUR_Ofav <- CUR %>%
   select(Sample.Name = sample_name, depth = depth_m, Symbiodinium = A, Breviolum = B, Cladocopium = C, Gerakladium = G)%>%
   mutate("Durusdinium" = 0) %>%
@@ -245,19 +221,13 @@ CUR_Ofav <- CUR %>%
   
 ```
 
-# Import Florida Keys Data
+# Import Manzello Florida Keys 2019 Data
 ```{r}
-KEY <- readxl::read_xlsx(path = "Data/qPCR_KEY/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx") 
+KEY <- readxl::read_xlsx(path = "Data/Manzello_Florida_Keys_2019/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx")
 
 KEY_fig_dat <- KEY %>%
   select(Sample.Name, time_point, condition, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
   gather(key = sym, value = value, -Sample.Name, -time_point, -condition)
-
-ggplot(KEY_fig_dat, aes(x = Sample.Name, y = value, fill = sym)) +
-  geom_bar(stat = "identity", position = "fill") +
-  facet_wrap(~time_point) +
-  facet_wrap(~condition) +
-  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c')) 
 
 initial <- KEY_fig_dat %>%
   filter(time_point == "initial") %>%
@@ -283,7 +253,6 @@ f <- ggplot(final, aes(x = Sample.Name, y = value, fill = sym)) +
 library(ggpubr) 
 ggarrange(i,f)
 ggsave(filename = "all_KEYS.png", width = 300, height = 150, units = "mm")
-
 
 KEY_healthy <- KEY %>%
   filter(condition == "H")
@@ -323,17 +292,18 @@ ggplot(KEY_Samps, aes(x = Sample.Name, y = value, fill = sym)) +
 
 ```
 
-# Import Baker Data
+# Import Karp Miami Data
 ```{r}
-MIA1 <- readxl::read_xlsx("Data/qpcr_MIA/MIA1.xlsx") %>%
+MIA1 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Emerald_Reef.xlsx") %>%
   filter(SampleName != NaN) 
 
-MIA2 <- readxl::read_xlsx("Data/qpcr_MIA/MIA2.xlsx") %>%
+MIA2 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Fisher_Island.xlsx") %>%
   filter(SampleName != NaN) 
 
-MIA3 <- readxl::read_xlsx("Data/qpcr_MIA/MIA3.xlsx") %>%
+MIA3 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Dry_Tortugas.xlsx") %>%
   filter(Sample.Name != NaN)
 
+# Renaming and selecting columns from Raw Data Files
 MIA1_Ofav <- MIA1 %>%
   filter(Species == "Ofav") %>%
   select(Sample.Name = SampleName, depth = depth_m, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
@@ -361,7 +331,8 @@ MIA3_Ofav <- MIA3 %>%
          B.CT.mean = as.numeric(B.CT.mean),
          C.CT.mean = as.numeric(C.CT.mean),
          D.CT.mean = as.numeric(D.CT.mean))
-  
+
+#Combining all 3 MIA Datasets 
 qpcr_MIA_Ofav <- rbind(MIA1_Ofav, MIA2_Ofav, MIA3_Ofav) %>%
   filter(A.reps != 1, B.reps != 1, C.reps != 1, D.reps != 1)
 
@@ -373,7 +344,7 @@ MIA_copy_num <- qpcr_MIA_Ofav %>%
          B.N = 2^(N - B.CT.mean)/1,
          C.N = 2^(N - C.CT.mean)/1,
          D.N = 2^(N - D.CT.mean)/1)
-
+# Convert Na to 0
 MIA_qpcr_prop <- MIA_copy_num %>%
   mutate(A.N = ifelse(is.na(A.N), 0, A.N),
          B.N = ifelse(is.na(B.N), 0, B.N),
@@ -383,6 +354,7 @@ MIA_qpcr_prop <- MIA_copy_num %>%
   mutate(total = sum(A.N + B.N + C.N + D.N))%>%
   mutate(A.prop = A.N/total, B.prop = B.N/total, C.prop = C.N/total, D.prop = D.N/total)
 
+# Renaming Clade Proportion to Genus Proportion 
 MIA_Ofav <- MIA_qpcr_prop %>%
   select(Sample.Name, depth, Symbiodinium = A.prop, Breviolum = B.prop, Cladocopium = C.prop, Durusdinium = D.prop) %>%
   mutate(depth = NA)
@@ -390,7 +362,7 @@ MIA_Ofav <- MIA_qpcr_prop %>%
 ```
 
 
-# Combining Exumas, Abacao, Florida Keys & establishing Dominant Symbiont
+# Combining Exumas, Abacao, Curaco, Florida Keys & establishing Dominant Symbiont
 ```{r}
 Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav) %>%
   mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
@@ -409,12 +381,12 @@ Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav) %>%
 
 # Stacked Bar Plot of Symbiont Composition per Sample  
 ```{r}
-a <- Ofav %>%
+all_sym_comp <- Ofav %>%
   select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
   gather(key = "sym", value = "value", -Sample.Name) 
 
 
-ggplot(a, aes(x = Sample.Name, y = value, fill = sym)) +
+ggplot(all_sym_comp, aes(x = Sample.Name, y = value, fill = sym)) +
   geom_bar(stat = "identity", position = "fill") +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
 
@@ -440,7 +412,7 @@ ggplot(dom_sym, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
 
 # Dominant Symbiont Proportion less than 8m
 ```{r}
-b <- Ofav %>%
+dom_sym_shallow <- Ofav %>%
   filter(depth < 8) %>%
   select(Sample.Name, depth, dom_sym) %>%
   filter(depth != "NA") %>%
@@ -450,7 +422,7 @@ b <- Ofav %>%
   mutate(n = sum(ncol), label = paste0("N =", n)) %>%
   mutate(prop = ncol/n)
 
-ggplot(b, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
+ggplot(dom_sym_shallow, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
   geom_bar(stat = "identity", position = "fill", size =20) +
   geom_text(aes(x = as.factor(depth_int), y = 1.05, label =label), inherit.aes = FALSE) +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
@@ -461,6 +433,8 @@ ggplot(b, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
 # 1. What is the probability of D-Dominance across depth
 # 2. What is the probability of Symbiont Combinations
 
+
+#Network Analysis 
 ```{r}
 library(igraph)
 
@@ -500,17 +474,6 @@ plot(net_orb, edge.curved = 0,
      vertex.color = ifelse(grepl(".*um", names(V(net_orb))), 
                            c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
                            colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(net_orb)$depth,breaks = 100))]))
-```
-
-
-
-```{r}
-net_master <- verts_orb %>%
-  select(Sample.Name = id, depth, lab) %>%
-  right_join(edges_orb)
-
-
-
 ```
 
 ```{r}

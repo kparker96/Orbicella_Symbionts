@@ -1,0 +1,195 @@
+Block Type	96-Well 0.1-mL Block																												
+Calibration Background is expired 	Yes																												
+Calibration Background performed on	03-02-2017																												
+Calibration Pure Dye ABY is expired	Yes																												
+Calibration Pure Dye ABY performed on	03-02-2017																												
+Calibration Pure Dye FAM is expired	No																												
+Calibration Pure Dye FAM performed on	09-19-2019																												
+Calibration Pure Dye JUN is expired	Yes																												
+Calibration Pure Dye JUN performed on	03-02-2017																												
+Calibration Pure Dye NED is expired	Yes																												
+Calibration Pure Dye NED performed on	03-02-2017																												
+Calibration Pure Dye ROX is expired	No																												
+Calibration Pure Dye ROX performed on	09-19-2019																												
+Calibration Pure Dye SYBR is expired	No																												
+Calibration Pure Dye SYBR performed on	09-19-2019																												
+Calibration Pure Dye TAMRA is expired	Yes																												
+Calibration Pure Dye TAMRA performed on	03-02-2017																												
+Calibration Pure Dye VIC is expired	No																												
+Calibration Pure Dye VIC performed on	09-19-2019																												
+Calibration ROI is expired 	Yes																												
+Calibration ROI performed on	03-02-2017																												
+Calibration Uniformity is expired 	Yes																												
+Calibration Uniformity performed on	03-02-2017																												
+Chemistry	TAQMAN																												
+Date Created	2019-09-20 16:04:04 PM PDT																												
+Experiment Barcode																													
+Experiment Comment																													
+Experiment File Name	D:\Users\INSTR-ADMIN\experiments\Daisy\emerald\DB_prebleach_1_200919.eds																												
+Experiment Name	DB_prebleach_1_200919																												
+Experiment Run End Time	2019-09-20 13:01:01 PM PDT																												
+Experiment Type	Standard Curve																												
+Instrument Name	      172310454																												
+Instrument Serial Number	172310454																												
+Instrument Type	QuantStudio™ 3 System																												
+Passive Reference	ROX																												
+Post-read Stage/Step																													
+Pre-read Stage/Step																													
+Quantification Cycle Method	Ct																												
+Signal Smoothing On	true																												
+Stage/ Cycle where Ct Analysis is performed	Stage2, Step2																												
+User Name																													
+																													
+Well	Well Position	Omit	Sample Name	Target Name	Task	Reporter	Quencher	CT	Ct Mean	Ct SD	Quantity	Quantity Mean	Quantity SD	Y-Intercept	R(superscript 2)	Slope	Efficiency	Automatic Ct Threshold	Ct Threshold	Automatic Baseline	Baseline Start	Baseline End	Amp Status	Comments	Cq Conf	CQCONF	EXPFAIL	HIGHSD	NOAMP
+7	A7	FALSE	ofav-34-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+8	A8	FALSE	ofav-34-b	b	UNKNOWN	FAM	NFQ-MGB	31.310	31.530	0.311								FALSE	0.020	TRUE	3	29	Amp		0.883	N	N	N	N
+9	A9	FALSE	ofav-34-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+9	A9	FALSE	ofav-34-b	d	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+13	B1	FALSE	ofav-4-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+14	B2	FALSE	ofav-4-a	b	UNKNOWN	FAM	NFQ-MGB	31.033	30.618	0.587								FALSE	0.020	TRUE	3	29	Amp		0.880	N	N	Y	N
+15	B3	FALSE	ofav-4-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+15	B3	FALSE	ofav-4-a	d	UNKNOWN	FAM	NFQ-MGB	33.054	32.950	0.148								FALSE	0.020	TRUE	3	31	Amp		0.904	N	N	N	N
+16	B4	FALSE	ofav-4-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+17	B5	FALSE	ofav-4-a	b	UNKNOWN	FAM	NFQ-MGB	30.203	30.618	0.587								FALSE	0.020	TRUE	3	28	Amp		0.898	N	N	Y	N
+18	B6	FALSE	ofav-4-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+18	B6	FALSE	ofav-4-a	d	UNKNOWN	FAM	NFQ-MGB	32.845	32.950	0.148								FALSE	0.020	TRUE	3	31	Amp		0.898	N	N	N	N
+19	B7	FALSE	ofav-34-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+20	B8	FALSE	ofav-34-b	b	UNKNOWN	FAM	NFQ-MGB	31.750	31.530	0.311								FALSE	0.020	TRUE	3	29	Amp		0.884	N	N	N	N
+21	B9	FALSE	ofav-34-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+21	B9	FALSE	ofav-34-b	d	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+22	B10	FALSE	ofav-62-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+23	B11	FALSE	ofav-62-b	b	UNKNOWN	FAM	NFQ-MGB	30.800	30.516	0.402								FALSE	0.020	TRUE	3	28	Amp		0.935	N	N	N	N
+24	B12	FALSE	ofav-62-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+24	B12	FALSE	ofav-62-b	d	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+25	C1	FALSE	ofav-4-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+26	C2	FALSE	ofav-4-b	b	UNKNOWN	FAM	NFQ-MGB	30.864	31.022	0.224								FALSE	0.020	TRUE	3	28	Amp		0.925	N	N	N	N
+27	C3	FALSE	ofav-4-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+27	C3	FALSE	ofav-4-b	d	UNKNOWN	FAM	NFQ-MGB	28.979	28.865	0.161								FALSE	0.020	TRUE	3	27	Amp		0.939	N	N	N	N
+28	C4	FALSE	ofav-4-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+29	C5	FALSE	ofav-4-b	b	UNKNOWN	FAM	NFQ-MGB	31.180	31.022	0.224								FALSE	0.020	TRUE	3	28	Amp		0.893	N	N	N	N
+30	C6	FALSE	ofav-4-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+30	C6	FALSE	ofav-4-b	d	UNKNOWN	FAM	NFQ-MGB	28.751	28.865	0.161								FALSE	0.020	TRUE	3	26	Amp		0.943	N	N	N	N
+31	C7	FALSE	ofav-36-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+32	C8	FALSE	ofav-36-a	b	UNKNOWN	FAM	NFQ-MGB	32.274	31.882	0.554								FALSE	0.020	TRUE	3	29	Amp		0.722	Y	N	Y	N
+33	C9	FALSE	ofav-36-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+33	C9	FALSE	ofav-36-a	d	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+34	C10	FALSE	ofav-62-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+35	C11	FALSE	ofav-62-b	b	UNKNOWN	FAM	NFQ-MGB	30.232	30.516	0.402								FALSE	0.020	TRUE	3	28	Amp		0.911	N	N	N	N
+36	C12	FALSE	ofav-62-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+36	C12	FALSE	ofav-62-b	d	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+37	D1	FALSE	ofav-13-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+38	D2	FALSE	ofav-13-a	b	UNKNOWN	FAM	NFQ-MGB	36.633	36.128	0.714								FALSE	0.020	TRUE	3	34	Inconclusive		0.773	Y	N	Y	N
+39	D3	FALSE	ofav-13-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+39	D3	FALSE	ofav-13-a	d	UNKNOWN	FAM	NFQ-MGB	27.122	27.231	0.154								FALSE	0.020	TRUE	3	25	Amp		0.900	N	N	N	N
+40	D4	FALSE	ofav-13-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+41	D5	FALSE	ofav-13-a	b	UNKNOWN	FAM	NFQ-MGB	35.623	36.128	0.714								FALSE	0.020	TRUE	3	32	Amp		0.749	Y	N	Y	N
+42	D6	FALSE	ofav-13-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+42	D6	FALSE	ofav-13-a	d	UNKNOWN	FAM	NFQ-MGB	27.340	27.231	0.154								FALSE	0.020	TRUE	3	25	Amp		0.919	N	N	N	N
+43	D7	FALSE	ofav-36-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+44	D8	FALSE	ofav-36-a	b	UNKNOWN	FAM	NFQ-MGB	31.490	31.882	0.554								FALSE	0.020	TRUE	3	29	Amp		0.897	N	N	Y	N
+45	D9	FALSE	ofav-36-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+45	D9	FALSE	ofav-36-a	d	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+46	D10	FALSE	ofav-64-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+47	D11	FALSE	ofav-64-a	b	UNKNOWN	FAM	NFQ-MGB	35.283	35.002	0.398								FALSE	0.020	TRUE	3	33	Amp		0.871	N	N	N	N
+48	D12	FALSE	ofav-64-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+48	D12	FALSE	ofav-64-a	d	UNKNOWN	FAM	NFQ-MGB	25.493	25.571	0.110								FALSE	0.020	TRUE	3	23	Amp		0.762	Y	N	N	N
+49	E1	FALSE	ofav-21-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+50	E2	FALSE	ofav-21-a	b	UNKNOWN	FAM	NFQ-MGB	29.637	30.038	0.567								FALSE	0.020	TRUE	3	27	Amp		0.873	N	N	Y	N
+51	E3	FALSE	ofav-21-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+51	E3	FALSE	ofav-21-a	d	UNKNOWN	FAM	NFQ-MGB	30.209	30.290	0.115								FALSE	0.020	TRUE	3	28	Amp		0.930	N	N	N	N
+52	E4	FALSE	ofav-21-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+53	E5	FALSE	ofav-21-a	b	UNKNOWN	FAM	NFQ-MGB	30.439	30.038	0.567								FALSE	0.020	TRUE	3	28	Amp		0.884	N	N	Y	N
+54	E6	FALSE	ofav-21-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+54	E6	FALSE	ofav-21-a	d	UNKNOWN	FAM	NFQ-MGB	30.372	30.290	0.115								FALSE	0.020	TRUE	3	28	Amp		0.934	N	N	N	N
+55	E7	FALSE	ofav-36-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+56	E8	FALSE	ofav-36-b	b	UNKNOWN	FAM	NFQ-MGB	30.687	30.582	0.148								FALSE	0.020	TRUE	3	28	Amp		0.866	N	N	N	N
+57	E9	FALSE	ofav-36-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+57	E9	FALSE	ofav-36-b	d	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+58	E10	FALSE	ofav-64-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+59	E11	FALSE	ofav-64-a	b	UNKNOWN	FAM	NFQ-MGB	34.720	35.002	0.398								FALSE	0.020	TRUE	3	33	Amp		0.805	N	N	N	N
+60	E12	FALSE	ofav-64-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+60	E12	FALSE	ofav-64-a	d	UNKNOWN	FAM	NFQ-MGB	25.649	25.571	0.110								FALSE	0.020	TRUE	3	23	Amp		0.774	Y	N	N	N
+61	F1	FALSE	ofav-21-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+62	F2	FALSE	ofav-21-b	b	UNKNOWN	FAM	NFQ-MGB	29.783	29.788	0.007								FALSE	0.020	TRUE	3	27	Amp		0.911	N	N	N	N
+63	F3	FALSE	ofav-21-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+63	F3	FALSE	ofav-21-b	d	UNKNOWN	FAM	NFQ-MGB	34.295	34.066	0.325								FALSE	0.020	TRUE	3	32	Amp		0.849	N	N	N	N
+64	F4	FALSE	ofav-21-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+65	F5	FALSE	ofav-21-b	b	UNKNOWN	FAM	NFQ-MGB	29.793	29.788	0.007								FALSE	0.020	TRUE	3	27	Amp		0.907	N	N	N	N
+66	F6	FALSE	ofav-21-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+66	F6	FALSE	ofav-21-b	d	UNKNOWN	FAM	NFQ-MGB	33.836	34.066	0.325								FALSE	0.020	TRUE	3	32	Amp		0.873	N	N	N	N
+67	F7	FALSE	ofav-36-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+68	F8	FALSE	ofav-36-b	b	UNKNOWN	FAM	NFQ-MGB	30.478	30.582	0.148								FALSE	0.020	TRUE	3	28	Amp		0.908	N	N	N	N
+69	F9	FALSE	ofav-36-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+69	F9	FALSE	ofav-36-b	d	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+70	F10	FALSE	ofav-64-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+71	F11	FALSE	ofav-64-b	b	UNKNOWN	FAM	NFQ-MGB	35.201	35.189	0.018								FALSE	0.020	TRUE	3	33	Amp		0.857	N	N	N	N
+72	F12	FALSE	ofav-64-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+72	F12	FALSE	ofav-64-b	d	UNKNOWN	FAM	NFQ-MGB	25.367	25.265	0.145								FALSE	0.020	TRUE	3	23	Amp		0.784	Y	N	N	N
+73	G1	FALSE	ofav-34-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	Amp		0.000	Y	Y	N	N
+74	G2	FALSE	ofav-34-a	b	UNKNOWN	FAM	NFQ-MGB	30.050	30.592	0.766								FALSE	0.020	TRUE	3	28	Amp		0.910	N	N	Y	N
+75	G3	FALSE	ofav-34-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+75	G3	FALSE	ofav-34-a	d	UNKNOWN	FAM	NFQ-MGB	33.776	33.776									FALSE	0.020	TRUE	3	32	Amp		0.886	N	N	N	N
+76	G4	FALSE	ofav-34-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+77	G5	FALSE	ofav-34-a	b	UNKNOWN	FAM	NFQ-MGB	31.134	30.592	0.766								FALSE	0.020	TRUE	3	29	Amp		0.895	N	N	Y	N
+78	G6	FALSE	ofav-34-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+78	G6	FALSE	ofav-34-a	d	UNKNOWN	FAM	NFQ-MGB	Undetermined	33.776									FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+79	G7	FALSE	ofav-62-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+80	G8	FALSE	ofav-62-a	b	UNKNOWN	FAM	NFQ-MGB	31.072	30.979	0.131								FALSE	0.020	TRUE	3	29	Amp		0.928	N	N	N	N
+81	G9	FALSE	ofav-62-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+81	G9	FALSE	ofav-62-a	d	UNKNOWN	FAM	NFQ-MGB	Undetermined	32.634									FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+82	G10	FALSE	ofav-64-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+83	G11	FALSE	ofav-64-b	b	UNKNOWN	FAM	NFQ-MGB	35.176	35.189	0.018								FALSE	0.020	TRUE	3	33	Amp		0.841	N	N	N	N
+84	G12	FALSE	ofav-64-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+84	G12	FALSE	ofav-64-b	d	UNKNOWN	FAM	NFQ-MGB	25.163	25.265	0.145								FALSE	0.020	TRUE	3	23	Amp		0.738	Y	N	N	N
+91	H7	FALSE	ofav-62-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+92	H8	FALSE	ofav-62-a	b	UNKNOWN	FAM	NFQ-MGB	30.887	30.979	0.131								FALSE	0.020	TRUE	3	29	Amp		0.918	N	N	N	N
+93	H9	FALSE	ofav-62-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+93	H9	FALSE	ofav-62-a	d	UNKNOWN	FAM	NFQ-MGB	32.634	32.634									FALSE	0.020	TRUE	3	31	Amp		0.913	N	N	N	N
+4	A4	FALSE	ofav-65-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+5	A5	FALSE	ofav-65-a	b	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+6	A6	FALSE	ofav-65-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+6	A6	FALSE	ofav-65-a	d	UNKNOWN	FAM	NFQ-MGB	26.951	26.810	0.199								FALSE	0.020	TRUE	3	25	Amp		0.804	N	N	N	N
+13	B1	FALSE	ofav-65-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+14	B2	FALSE	ofav-65-b	b	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+15	B3	FALSE	ofav-65-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+15	B3	FALSE	ofav-65-b	d	UNKNOWN	FAM	NFQ-MGB	27.689	27.655	0.048								FALSE	0.020	TRUE	3	26	Amp		0.883	N	N	N	N
+16	B4	FALSE	ofav-65-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+17	B5	FALSE	ofav-65-b	b	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+18	B6	FALSE	ofav-65-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+18	B6	FALSE	ofav-65-b	d	UNKNOWN	FAM	NFQ-MGB	27.621	27.655	0.048								FALSE	0.020	TRUE	3	26	Amp		0.832	N	N	N	N
+25	C1	FALSE	ofav-66-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+26	C2	FALSE	ofav-66-a	b	UNKNOWN	FAM	NFQ-MGB	Undetermined	37.014									FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+27	C3	FALSE	ofav-66-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+27	C3	FALSE	ofav-66-a	d	UNKNOWN	FAM	NFQ-MGB	27.631	28.327	0.984								FALSE	0.020	TRUE	3	26	Amp		0.869	N	N	Y	N
+28	C4	FALSE	ofav-66-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+29	C5	FALSE	ofav-66-a	b	UNKNOWN	FAM	NFQ-MGB	37.014	37.014									FALSE	0.020	TRUE	3	35	Inconclusive		0.726	Y	N	N	N
+30	C6	FALSE	ofav-66-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+30	C6	FALSE	ofav-66-a	d	UNKNOWN	FAM	NFQ-MGB	29.023	28.327	0.984								FALSE	0.020	TRUE	3	26	Amp		0.859	N	N	Y	N
+37	D1	FALSE	ofav-66-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+38	D2	FALSE	ofav-66-b	b	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+39	D3	FALSE	ofav-66-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+39	D3	FALSE	ofav-66-b	d	UNKNOWN	FAM	NFQ-MGB	26.802	26.812	0.014								FALSE	0.020	TRUE	3	25	Amp		0.828	N	N	N	N
+40	D4	FALSE	ofav-66-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+41	D5	FALSE	ofav-66-b	b	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+42	D6	FALSE	ofav-66-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+42	D6	FALSE	ofav-66-b	d	UNKNOWN	FAM	NFQ-MGB	26.821	26.812	0.014								FALSE	0.020	TRUE	3	25	Amp		0.835	N	N	N	N
+49	E1	FALSE	ofav-81-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+50	E2	FALSE	ofav-81-a	b	UNKNOWN	FAM	NFQ-MGB	30.857	31.179	0.454								FALSE	0.020	TRUE	3	28	Amp		0.891	N	N	N	N
+51	E3	FALSE	ofav-81-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+51	E3	FALSE	ofav-81-a	d	UNKNOWN	FAM	NFQ-MGB	30.290	30.259	0.045								FALSE	0.020	TRUE	3	28	Amp		0.933	N	N	N	N
+52	E4	FALSE	ofav-81-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+53	E5	FALSE	ofav-81-a	b	UNKNOWN	FAM	NFQ-MGB	31.500	31.179	0.454								FALSE	0.020	TRUE	3	29	Amp		0.900	N	N	N	N
+54	E6	FALSE	ofav-81-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+54	E6	FALSE	ofav-81-a	d	UNKNOWN	FAM	NFQ-MGB	30.227	30.259	0.045								FALSE	0.020	TRUE	3	28	Amp		0.930	N	N	N	N
+61	F1	FALSE	ofav-81-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+62	F2	FALSE	ofav-81-b	b	UNKNOWN	FAM	NFQ-MGB	30.306	30.216	0.126								FALSE	0.020	TRUE	3	29	Amp		0.901	N	N	N	N
+63	F3	FALSE	ofav-81-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+63	F3	FALSE	ofav-81-b	d	UNKNOWN	FAM	NFQ-MGB	31.519	31.482	0.052								FALSE	0.020	TRUE	3	30	Amp		0.928	N	N	N	N
+64	F4	FALSE	ofav-81-b	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+65	F5	FALSE	ofav-81-b	b	UNKNOWN	FAM	NFQ-MGB	30.127	30.216	0.126								FALSE	0.020	TRUE	3	27	Amp		0.936	N	N	N	N
+66	F6	FALSE	ofav-81-b	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+66	F6	FALSE	ofav-81-b	d	UNKNOWN	FAM	NFQ-MGB	31.445	31.482	0.052								FALSE	0.020	TRUE	3	29	Amp		0.919	N	N	N	N
+88	H4	FALSE	ofav-65-a	a	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+89	H5	FALSE	ofav-65-a	b	UNKNOWN	FAM	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	Y
+90	H6	FALSE	ofav-65-a	c	UNKNOWN	VIC	NFQ-MGB	Undetermined										FALSE	0.020	TRUE	3	39	No Amp		0.000	Y	Y	N	N
+90	H6	FALSE	ofav-65-a	d	UNKNOWN	FAM	NFQ-MGB	26.670	26.810	0.199								FALSE	0.020	TRUE	3	25	Amp		0.728	Y	N	N	N

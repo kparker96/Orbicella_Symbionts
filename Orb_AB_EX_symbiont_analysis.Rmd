@@ -365,6 +365,7 @@ MIA_Ofav <- MIA_qpcr_prop %>%
 # Combining Exumas, Abacao, Curaco, Florida Keys & establishing Dominant Symbiont
 ```{r}
 Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav) %>%
+  filter(Sample.Name != "NEC6", Sample.Name != "PTC") %>% # GO BACK AND SEE WHY THESE SLIP THROUGH
   mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
                              ~ "Breviolum",
                              Cladocopium > Breviolum & Cladocopium > Durusdinium & Cladocopium > Symbiodinium
@@ -374,7 +375,7 @@ Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav) %>%
                              Symbiodinium > Breviolum & Symbiodinium > Cladocopium & Symbiodinium >
                              Durusdinium ~ "Symbiodinium")) %>%
   select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym) %>%
-  ungroup()
+  ungroup() 
 
 ```
 
@@ -428,10 +429,160 @@ ggplot(dom_sym_shallow, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym))
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
 ```
 
+#Converting Proportion decimals to percent 
+```{r}
+no_round <- Ofav %>%
+    select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+    mutate(Symbiodinium = Symbiodinium * 100, 
+          Breviolum = Breviolum * 100, 
+          Cladocopium = Cladocopium * 100, 
+          Durusdinium = Durusdinium * 100) %>%
+  select(Sample.Name, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  mutate(pattern = case_when(A > 0 & B == 0 & C == 0 & D == 0 ~ "A",
+                             A == 0 & B > 0 & C == 0 & D == 0 ~ "B",
+                             A == 0 & B == 0 & C > 0 & D == 0 ~ "C",
+                             A == 0 & B == 0 & C == 0 & D > 0 ~ "D",
+                             A > 0 & B > 0 & C == 0 & D == 0 ~ "AB",
+                             A > 0 & B == 0 & C > 0 & D == 0 ~ "AC",
+                             A > 0 & B == 0 & C == 0 & D > 0 ~ "AD",
+                             A == 0 & B > 0 & C > 0 & D == 0 ~ "BC",
+                             A == 0 & B > 0 & C == 0 & D > 0 ~ "BD",
+                             A == 0 & B == 0 & C > 0 & D > 0 ~ "CD",
+                             A > 0 & B > 0 & C > 0 & D == 0 ~ "ABC",
+                             A > 0 & B > 0 & C == 0 & D > 0 ~ "ABD",
+                             A > 0 & B == 0 & C > 0 & D > 0 ~ "ACD",
+                             A == 0 & B > 0 & C > 0 & D > 0 ~ "BCD",
+                             A > 0 & B > 0 & C > 0 & D > 0 ~ "ABCD"))
 
-### Questions 
-# 1. What is the probability of D-Dominance across depth
-# 2. What is the probability of Symbiont Combinations
+no_round %>%
+  group_by(pattern) %>%
+  count(vars = "pattern") %>%
+  select(pattern, n)
+
+
+
+
+
+
+
+
+
+round_0_dec <- Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  mutate(Symbiodinium = Symbiodinium * 100, 
+          Breviolum = Breviolum * 100, 
+          Cladocopium = Cladocopium * 100, 
+          Durusdinium = Durusdinium * 100) %>%
+  mutate(Symbiodinium = round(Symbiodinium, digits = 0),
+         Breviolum = round(Breviolum, digits = 0),
+         Cladocopium = round(Cladocopium, digits = 0),
+         Durusdinium = round(Durusdinium, digits = 0)) %>%
+  mutate(total = Symbiodinium + Breviolum + Cladocopium + Durusdinium)
+
+
+zero_dec <- round_0_dec %>%
+  select(Sample.Name, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  mutate(pattern = case_when(A > 0 & B == 0 & C == 0 & D == 0 ~ "A",
+                             A == 0 & B > 0 & C == 0 & D == 0 ~ "B",
+                             A == 0 & B == 0 & C > 0 & D == 0 ~ "C",
+                             A == 0 & B == 0 & C == 0 & D > 0 ~ "D",
+                             A > 0 & B > 0 & C == 0 & D == 0 ~ "AB",
+                             A > 0 & B == 0 & C > 0 & D == 0 ~ "AC",
+                             A > 0 & B == 0 & C == 0 & D > 0 ~ "AD",
+                             A == 0 & B > 0 & C > 0 & D == 0 ~ "BC",
+                             A == 0 & B > 0 & C == 0 & D > 0 ~ "BD",
+                             A == 0 & B == 0 & C > 0 & D > 0 ~ "CD",
+                             A > 0 & B > 0 & C > 0 & D == 0 ~ "ABC",
+                             A > 0 & B > 0 & C == 0 & D > 0 ~ "ABD",
+                             A > 0 & B == 0 & C > 0 & D > 0 ~ "ACD",
+                             A == 0 & B > 0 & C > 0 & D > 0 ~ "BCD",
+                             A > 0 & B > 0 & C > 0 & D > 0 ~ "ABCD"))
+round_1_dec <- Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  mutate(Symbiodinium = Symbiodinium * 100, 
+          Breviolum = Breviolum * 100, 
+          Cladocopium = Cladocopium * 100, 
+          Durusdinium = Durusdinium * 100) %>%
+  mutate(Symbiodinium = round(Symbiodinium, digits = 1),
+         Breviolum = round(Breviolum, digits = 1),
+         Cladocopium = round(Cladocopium, digits = 1),
+         Durusdinium = round(Durusdinium, digits = 1)) %>%
+  mutate(total = Symbiodinium + Breviolum + Cladocopium + Durusdinium)
+
+one_dec <- round_1_dec %>%
+  select(Sample.Name, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  mutate(pattern = case_when(A > 0 & B == 0 & C == 0 & D == 0 ~ "A",
+                             A == 0 & B > 0 & C == 0 & D == 0 ~ "B",
+                             A == 0 & B == 0 & C > 0 & D == 0 ~ "C",
+                             A == 0 & B == 0 & C == 0 & D > 0 ~ "D",
+                             A > 0 & B > 0 & C == 0 & D == 0 ~ "AB",
+                             A > 0 & B == 0 & C > 0 & D == 0 ~ "AC",
+                             A > 0 & B == 0 & C == 0 & D > 0 ~ "AD",
+                             A == 0 & B > 0 & C > 0 & D == 0 ~ "BC",
+                             A == 0 & B > 0 & C == 0 & D > 0 ~ "BD",
+                             A == 0 & B == 0 & C > 0 & D > 0 ~ "CD",
+                             A > 0 & B > 0 & C > 0 & D == 0 ~ "ABC",
+                             A > 0 & B > 0 & C == 0 & D > 0 ~ "ABD",
+                             A > 0 & B == 0 & C > 0 & D > 0 ~ "ACD",
+                             A == 0 & B > 0 & C > 0 & D > 0 ~ "BCD",
+                             A > 0 & B > 0 & C > 0 & D > 0 ~ "ABCD"))
+
+round_2_dec <- Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  mutate(Symbiodinium = Symbiodinium * 100, 
+          Breviolum = Breviolum * 100, 
+          Cladocopium = Cladocopium * 100, 
+          Durusdinium = Durusdinium * 100) %>%
+  mutate(Symbiodinium = round(Symbiodinium, digits = 2),
+         Breviolum = round(Breviolum, digits = 2),
+         Cladocopium = round(Cladocopium, digits = 2),
+         Durusdinium = round(Durusdinium, digits = 2)) %>%
+  mutate(total = Symbiodinium + Breviolum + Cladocopium + Durusdinium)
+
+two_dec <- round_2_dec %>%
+  select(Sample.Name, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  mutate(pattern = case_when(A > 0 & B == 0 & C == 0 & D == 0 ~ "A",
+                             A == 0 & B > 0 & C == 0 & D == 0 ~ "B",
+                             A == 0 & B == 0 & C > 0 & D == 0 ~ "C",
+                             A == 0 & B == 0 & C == 0 & D > 0 ~ "D",
+                             A > 0 & B > 0 & C == 0 & D == 0 ~ "AB",
+                             A > 0 & B == 0 & C > 0 & D == 0 ~ "AC",
+                             A > 0 & B == 0 & C == 0 & D > 0 ~ "AD",
+                             A == 0 & B > 0 & C > 0 & D == 0 ~ "BC",
+                             A == 0 & B > 0 & C == 0 & D > 0 ~ "BD",
+                             A == 0 & B == 0 & C > 0 & D > 0 ~ "CD",
+                             A > 0 & B > 0 & C > 0 & D == 0 ~ "ABC",
+                             A > 0 & B > 0 & C == 0 & D > 0 ~ "ABD",
+                             A > 0 & B == 0 & C > 0 & D > 0 ~ "ACD",
+                             A == 0 & B > 0 & C > 0 & D > 0 ~ "BCD",
+                             A > 0 & B > 0 & C > 0 & D > 0 ~ "ABCD"))
+
+a <- zero_dec %>%
+   group_by(pattern) %>%
+  count(vars = "pattern") %>%
+  select(pattern, n)
+
+b <- one_dec %>%
+  group_by(pattern) %>%
+  count(vars = "pattern") %>%
+  select(pattern, n) 
+
+c <- two_dec %>%
+  group_by(pattern) %>%
+  count(vars = "pattern") %>%
+  select(pattern, n)
+
+r <- right_join(a, b, by = "pattern")
+
+l <- right_join(r, c, by = "pattern") %>%
+  rename(zero = n.x, one = n.y, two = n)
+```
+
+
+```{r}
+distinct_combos <- zero_dec %>%
+  distinct(A, B, C, D, .keep_all = TRUE)
+```
 
 
 #Network Analysis 
@@ -475,6 +626,67 @@ plot(net_orb, edge.curved = 0,
                            c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
                            colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(net_orb)$depth,breaks = 100))]))
 ```
+
+
+#Network with distinct samples
+```{r}
+library(igraph)
+
+net_data_distinct <- distinct_combos %>%
+  select(Sample.Name, Symbiodinium = A, Breviolum = B, Cladocopium = C, Durusdinium = D)
+
+edges_distinct <- net_data_distinct %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+depth_distinct <- Ofav %>%
+  filter(Sample.Name %in% distinct_combos$Sample.Name) %>%
+  select(Sample.Name, depth)
+
+verts_distinct <- tibble(Sample.Name = c(net_data_distinct$Sample.Name, colnames(net_data_distinct)[-1])) %>%
+  left_join(depth_distinct) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+net_distinct <- graph_from_data_frame(edges_distinct, directed = FALSE, vertices = verts_distinct)
+
+set.seed(15)
+
+plot(net_distinct, edge.curved = 0,
+     edge.width = 2 * (E(net_distinct)$weight)^0.07, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(net_distinct)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl(".*um", names(V(net_distinct))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(net_distinct))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(net_distinct)$depth,breaks = 100))]))
+
+ggsave(filename = "distinct_sample_network.png", width = 300, height = 150, units = "mm")
+
+ggsave(filename = "distinct_network.png", width = 300, height = 150, units = "mm")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 Ofav

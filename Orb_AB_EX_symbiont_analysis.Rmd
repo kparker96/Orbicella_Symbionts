@@ -16,7 +16,7 @@ library(tidyverse) # (install.packages("tidyverse")
 ```
 
 # Data Key
-# AB  <- Parker_Abaco_2019
+# AB  <- Parker_Abaco_2020
 # EX  <- Unpublished_Exumas
 # KEY <- Manzello_Florida_Keys_2019
 # MIA <- Karp_Miami_Unpublished
@@ -48,15 +48,16 @@ raw_sample_data_EX <- readxl::read_xlsx("Data/Unpublished_Exumas/sample_data_Exu
 
 #renaming  colomns of sample data to match qpcr data
 sample_data_EX <- raw_sample_data_EX %>%
-  select(Sample.Name = sample_id, site, genus, species, depth = colony_depth_m, range)
+  select(Sample.Name = sample_id, site, genus, species, depth = colony_depth_m, site, range)
 
 # Joining sample data with qpcr data and removing NA samples
 EX_Ofav <- right_join(sample_data_EX, qpcr_EX, by = "Sample.Name", all = TRUE) %>%
   filter(genus == "orbicella")
 
 qpcr_EX_Ofav <- EX_Ofav %>%
-  select(Sample.Name, File.Name, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd, B.CT.sd, C.CT.sd,
-         D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A)
+  select(Sample.Name, File.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd, B.CT.sd,
+         C.CT.sd,D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A) %>%
+  mutate(region = "Exumas")
 ```
 
 #Importing Raw Abaco qPCR Data from Quant Studio Design and Analysis Software 
@@ -80,7 +81,8 @@ qpcr_AB <- df_AB$result %>%
 ```{r}
 #library(readr)
 sample_data_AB <- readxl::read_xlsx("Data/Parker_Abaco_2019/sample_data_Abaco.xlsx") %>%
-  select(Sample.Name = tube_label, depth = colony_depth_m)
+  select(Sample.Name = tube_label, depth = colony_depth_m, site) %>%
+  mutate(region = "Abaco")
 
 qpcr_AB_Ofav <- right_join(sample_data_AB, qpcr_AB, by = "Sample.Name", all = TRUE)
 
@@ -206,18 +208,19 @@ EXAB_Ofav <- Ofav_good %>%
           Breviolum = ifelse(is.na(Breviolum), 0, Breviolum),
           Cladocopium = ifelse(is.na(Cladocopium), 0, Cladocopium),
           Durusdinium = ifelse(is.na(Durusdinium), 0, Durusdinium)) %>%
-  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+  select(Sample.Name, region, site, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
 
 ```
 
 #Import Green Curacao 2014 Data 
 ```{r}
-CUR <- readxl::read_xlsx(path = "Data/Green_Curacao_2014/qpcr_green_curacao_data.xlsx") 
+CUR <- readxl::read_xlsx(path = "Data/Green_Curacao_2014/ITS2_green_curacao_data.xlsx") 
 
 CUR_Ofav <- CUR %>%
   select(Sample.Name = sample_name, depth = depth_m, Symbiodinium = A, Breviolum = B, Cladocopium = C, Gerakladium = G)%>%
   mutate("Durusdinium" = 0) %>%
-  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  mutate(region = "Curacao", site = NA)
   
 ```
 
@@ -274,7 +277,8 @@ KEY_H_single <- KEY_healthy %>%
   filter(!(Sample.Name %in% KEY_dupes_dat$Sample.Name))
 
 KEY_Ofav <- rbind(KEY_dupes_initial, KEY_H_single) %>%
-  select(Sample.Name, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+  select(Sample.Name, site, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  mutate(region = case_when(grepl("LK", site) ~ "Lower_Keys",grepl("UK", site) ~ "Upper_Keys"))
 
 
 KEY_Samps <- KEY_Ofav %>%
@@ -306,22 +310,24 @@ MIA3 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Dry_Tortugas.xlsx") 
 # Renaming and selecting columns from Raw Data Files
 MIA1_Ofav <- MIA1 %>%
   filter(Species == "Ofav") %>%
-  select(Sample.Name = SampleName, depth = depth_m, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
-  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
-  mutate(A.CT.mean = as.numeric(A.CT.mean),
-         B.CT.mean = as.numeric(B.CT.mean),
-         C.CT.mean = as.numeric(C.CT.mean),
-         D.CT.mean = as.numeric(D.CT.mean))
-
-MIA2_Ofav <- MIA2 %>% 
- filter(Species == "Ofav") %>%
-  select(Sample.Name = SampleName, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
+  select(Sample.Name = SampleName, site = Reef, depth = depth_m, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
   A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
   mutate(A.CT.mean = as.numeric(A.CT.mean),
          B.CT.mean = as.numeric(B.CT.mean),
          C.CT.mean = as.numeric(C.CT.mean),
          D.CT.mean = as.numeric(D.CT.mean)) %>%
-  mutate(depth = NaN)
+  mutate(region = "Miami")
+
+MIA2_Ofav <- MIA2 %>% 
+ filter(Species == "Ofav") %>%
+  select(Sample.Name = SampleName, site = Location, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
+  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
+  mutate(A.CT.mean = as.numeric(A.CT.mean),
+         B.CT.mean = as.numeric(B.CT.mean),
+         C.CT.mean = as.numeric(C.CT.mean),
+         D.CT.mean = as.numeric(D.CT.mean)) %>%
+  mutate(depth = NaN) %>%
+  mutate(region = "Miami")
 
 MIA3_Ofav <- MIA3 %>%
   filter(Species == "OFAV") %>%
@@ -330,7 +336,9 @@ MIA3_Ofav <- MIA3 %>%
    mutate(A.CT.mean = as.numeric(A.CT.mean),
          B.CT.mean = as.numeric(B.CT.mean),
          C.CT.mean = as.numeric(C.CT.mean),
-         D.CT.mean = as.numeric(D.CT.mean))
+         D.CT.mean = as.numeric(D.CT.mean)) %>%
+  mutate(site = "Dry_Tortugas") %>%
+  mutate(region = "Dry_Tortugas")
 
 #Combining all 3 MIA Datasets 
 qpcr_MIA_Ofav <- rbind(MIA1_Ofav, MIA2_Ofav, MIA3_Ofav) %>%
@@ -344,6 +352,7 @@ MIA_copy_num <- qpcr_MIA_Ofav %>%
          B.N = 2^(N - B.CT.mean)/1,
          C.N = 2^(N - C.CT.mean)/1,
          D.N = 2^(N - D.CT.mean)/1)
+
 # Convert Na to 0
 MIA_qpcr_prop <- MIA_copy_num %>%
   mutate(A.N = ifelse(is.na(A.N), 0, A.N),
@@ -356,10 +365,11 @@ MIA_qpcr_prop <- MIA_copy_num %>%
 
 # Renaming Clade Proportion to Genus Proportion 
 MIA_Ofav <- MIA_qpcr_prop %>%
-  select(Sample.Name, depth, Symbiodinium = A.prop, Breviolum = B.prop, Cladocopium = C.prop, Durusdinium = D.prop) %>%
+  select(Sample.Name, region, site, depth, Symbiodinium = A.prop, Breviolum = B.prop, Cladocopium = C.prop, Durusdinium = D.prop) %>%
   mutate(depth = NA)
 
 ```
+
 
 
 # Combining Exumas, Abacao, Curaco, Florida Keys & establishing Dominant Symbiont
@@ -374,7 +384,7 @@ Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav) %>%
                              ~ "Durusdinium",
                              Symbiodinium > Breviolum & Symbiodinium > Cladocopium & Symbiodinium >
                              Durusdinium ~ "Symbiodinium")) %>%
-  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym) %>%
+  select(Sample.Name, region, site, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym) %>%
   ungroup() 
 
 ```
@@ -458,14 +468,6 @@ no_round %>%
   group_by(pattern) %>%
   count(vars = "pattern") %>%
   select(pattern, n)
-
-
-
-
-
-
-
-
 
 round_0_dec <- Ofav %>%
   select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%

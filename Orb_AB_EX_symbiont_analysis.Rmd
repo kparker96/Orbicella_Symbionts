@@ -632,7 +632,6 @@ plot(net_orb, edge.curved = 0,
 
 #Network with distinct samples
 ```{r}
-library(igraph)
 
 net_data_distinct <- distinct_combos %>%
   select(Sample.Name, Symbiodinium = A, Breviolum = B, Cladocopium = C, Durusdinium = D)
@@ -677,6 +676,39 @@ ggsave(filename = "distinct_network.png", width = 300, height = 150, units = "mm
 ```
 
 
+# Adjacency Matrix of Distinct Samples
+```{r}
+symbiont_pres <- distinct_combos %>%
+  mutate(A = ifelse(A > 0, 1, 0),
+         B = ifelse(B > 0, 1, 0),
+         C = ifelse(C > 0, 1, 0),
+         D = ifelse(D > 0, 1, 0)) %>%
+  mutate(degree = A + B + C + D)
+
+```
+
+```{r}
+dom_sym <- Ofav %>%
+  select(Sample.Name, dom_sym) %>%
+  filter(Sample.Name %in% distinct_combos$Sample.Name)
+
+
+hist <- symbiont_pres %>%
+  right_join(dom_sym)
+
+ ggplot(hist, aes(x = degree)) + 
+   geom_histogram(binwidth = 0.9) +
+   theme_bw()
+
+ ggplot(hist, aes(x = degree)) + 
+   geom_histogram(binwidth = 0.9) +
+   facet_wrap(~dom_sym) +
+   theme_bw()
+  
+
+
+
+```
 
 
 

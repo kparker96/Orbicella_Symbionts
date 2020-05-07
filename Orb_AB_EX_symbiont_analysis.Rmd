@@ -20,83 +20,28 @@ library(tidyverse) # (install.packages("tidyverse")
 # EX  <- Unpublished_Exumas
 # KEY <- Manzello_Florida_Keys_2019
 # MIA <- Karp_Miami_Unpublished
-# CUR <- Green_Curaco_2014 
+# DRT <- Karp_Dry_Tortugas
+# CUR <- Green_Curaco_2014
+# WEL <- Williamson_Eluthera
+# WER <- Williamson_Emerald_Reef
 
-#Importing Raw Exumas qPCR Data from Quant Studio Design and Analysis Software 
+# Import Abaco Data
 ```{r}
-# List Exuma symbiodinium data files
-plates_EX <- list.files(path = "Data/Unpublished_Exumas", pattern = ".txt", full.names = TRUE)
+AB <- readxl::read_xlsx("Data/Parker_Abaco_2019/Parker_Abaco_2019.xlsx")
 
-# Read in data and calculate target ratios
-df_EX <- steponeR(files = plates_EX,
-               delim = "\t", 
-               target.ratios = "A.A", 
-               fluor.norm = list(C = 2.234, D = 1, A = 1, B = 1),
-               copy.number = list(C = 20, D = 3, A = 1, B = 1),
-               ploidy = list(C = 1, D = 1, A = 1, B = 1),
-               extract = list(C = 0.813, D = 0.813, A = 0.813, B = 0.813))
-qpcr_EX <- df_EX$result
+qpcr_AB <- AB %>%
+  select(Sample.Name, region, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean) %>%
+    mutate(A.CT.mean = as.numeric(A.CT.mean),
+         B.CT.mean = as.numeric(B.CT.mean),
+         C.CT.mean = as.numeric(C.CT.mean),
+         D.CT.mean = as.numeric(D.CT.mean))
 
 ```
 
-#Importing Exumas Sample Data and filtering out other species from Exumas raw qPCR data
-```{r}
-# Import Sample Data 
-library(readr)
-
-raw_sample_data_EX <- readxl::read_xlsx("Data/Unpublished_Exumas/sample_data_Exumas.xlsx")
-
-#renaming  colomns of sample data to match qpcr data
-sample_data_EX <- raw_sample_data_EX %>%
-  select(Sample.Name = sample_id, site, genus, species, depth = colony_depth_m, site, range)
-
-# Joining sample data with qpcr data and removing NA samples
-EX_Ofav <- right_join(sample_data_EX, qpcr_EX, by = "Sample.Name", all = TRUE) %>%
-  filter(genus == "orbicella")
-
-qpcr_EX_Ofav <- EX_Ofav %>%
-  select(Sample.Name, File.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd, B.CT.sd,
-         C.CT.sd,D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A) %>%
-  mutate(region = "Exumas")
-```
-
-#Importing Raw Abaco qPCR Data from Quant Studio Design and Analysis Software 
-```{r}
-plates_AB <- list.files(path = "Data/Parker_Abaco_2019", pattern = ".txt", full.names = TRUE)
-
-# Read in data and calculate target ratios
-df_AB <- steponeR(files = plates_AB, 
-               delim = "\t", 
-               target.ratios = "A.A", 
-               fluor.norm = list(C = 2.234, D = 1, Orb = 1, A = 1, B = 1),
-               copy.number = list(C = 20, D = 3, Orb = 1, A = 1, B = 1),
-               ploidy = list(C = 1, D = 1, Orb = 2, A = 1, B = 1),
-               extract = list(C = 0.813, D = 0.813, Orb = 0.982, A = 0.813, B = 0.813))
-qpcr_AB <- df_AB$result %>%
-  select(Sample.Name, File.Name, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd, B.CT.sd, C.CT.sd,
-         D.CT.sd, A.reps, B.reps, C.reps, D.reps, A.A)
-```
-
-#Import Abaco Depth Data and add to Abaco qpcr data
-```{r}
-#library(readr)
-sample_data_AB <- readxl::read_xlsx("Data/Parker_Abaco_2019/sample_data_Abaco.xlsx") %>%
-  select(Sample.Name = tube_label, depth = colony_depth_m, site) %>%
-  mutate(region = "Abaco")
-
-qpcr_AB_Ofav <- right_join(sample_data_AB, qpcr_AB, by = "Sample.Name", all = TRUE)
-
-```
-
-#Combine Exumas and Abaco
-```{r}
-Ofav_qpcr <- rbind(qpcr_EX_Ofav, qpcr_AB_Ofav)
-```
-
-# Establishing Ratios for Exumas and Abaco Data
+# Establishing Ratios for Abaco Data
 ```{r}
 # adjust CT for flouresence 
-qpcr_flor <- Ofav_qpcr %>%
+qpcr_flor <- qpcr_AB %>%
   mutate(A.CT.mean = A.CT.mean - 1,
          B.CT.mean = B.CT.mean - 1,
          C.CT.mean = C.CT.mean - 1,
@@ -119,83 +64,171 @@ qpcr_prop <- qpcr_copy_num %>%
   mutate(total = sum(A.N + B.N + C.N + D.N))%>%
   mutate(A.prop = A.N/total, B.prop = B.N/total, C.prop = C.N/total, D.prop = D.N/total)
    
+AB_Ofav <- qpcr_prop %>%
+  select(Sample.Name, site, region, depth, A.prop, B.prop, C.prop, D.prop) 
 ```
 
-# Organizing Exumas/Abaco qPCR Data
+# Import Exumas Data 
 ```{r}
-# Convert NaN CT values to 0  
-qpcr <- qpcr_prop %>%
- mutate(A.CT.mean = ifelse(is.na(A.CT.mean), 0, A.CT.mean),
-         B.CT.mean = ifelse(is.na(B.CT.mean), 0, B.CT.mean),
-         C.CT.mean = ifelse(is.na(C.CT.mean), 0, C.CT.mean),
-         D.CT.mean = ifelse(is.na(D.CT.mean), 0, D.CT.mean))
+EX <- readxl::read_xlsx("Data/Unpublished_Exumas/Exumas_Unpublished.xlsx")
 
-# Samples that did not amplify for any symbionts
-fails <- qpcr %>%
-  filter(A.CT.mean == 0 & B.CT.mean == 0 & C.CT.mean == 0 & D.CT.mean == 0) 
+EX_Ofav <- EX %>%
+  filter(species == "faveolata") %>%
+  mutate(region = "Exumas") %>%
+  select(Sample.Name, site, region, depth, A.prop, B.prop, C.prop, D.prop)
+```
 
-# Samples that need to be rerun due to 1 technical replicate or SD > 1
-reruns <- qpcr %>%
-  filter(Sample.Name != "PTC", Sample.Name != "NTC") %>%
-  filter(A.reps == 1 | B.reps == 1 | C.reps == 1 | D.reps == 1 | A.CT.sd > 1.05 | B.CT.sd > 1.05 | C.CT.sd > 1.05 | D.CT.sd > 1.05)
+#Import Green Curacao 2014 Data 
+```{r}
+CUR <- readxl::read_xlsx(path = "Data/Green_Curacao_2014/ITS2_green_curacao_data.xlsx") 
 
-qpcr_data <- qpcr %>%
-   filter(A.CT.mean != 0 | B.CT.mean != 0 | C.CT.mean != 0 | D.CT.mean != 0)
-
+CUR_Ofav <- CUR %>%
+  select(Sample.Name = sample_name, depth = depth_m, A.prop = A, B.prop = B, C.prop = C, G.prop = G)%>%
+  mutate("D.prop" = 0) %>%
+  select(Sample.Name, depth, A.prop, B.prop, C.prop, D.prop) %>%
+  mutate(region = "Curacao", site = "Curacao")
   
 ```
 
-#Filtering out "bad" Exumas/Abaco data/replicates
+#Import Manzello Data 
 ```{r}
-#Determing which samples have 2 replicates in the data set 
-dupes <- qpcr_data %>%
-  group_by(Sample.Name) %>%
-  count(vars = "Sample.Name") %>%
+KEY <- readxl::read_xlsx(path = "Data/Manzello_Florida_Keys_2019/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx")
+
+KEY_healthy <- KEY %>%
+  filter(condition == "H")
+
+KEY_H_dupes <- KEY_healthy %>%
+  group_by(tag_number) %>%
+  count(vars = "tag_number") %>%
   filter(n > 1) 
 
 #Gathering the full data for samples with 2 replicates
-Ofav_dupes <- qpcr_data %>%
-  filter(Sample.Name %in% dupes$Sample.Name) %>%
-  arrange(Sample.Name)
+KEY_dupes_dat <- KEY_healthy %>%
+  filter(tag_number %in% KEY_H_dupes$tag_number) %>%
+  arrange(tag_number)
 
-#filtering out data with only 1 technical replicate
-Ofav_dupes_f1 <- Ofav_dupes %>%
-  group_by(Sample.Name) %>%
-  filter(A.reps != 1, B.reps != 1, C.reps != 1, D.reps != 1) %>%
-  ungroup()
-  
-# Average SD  
-Ofav_dupes_f2 <- Ofav_dupes_f1 %>%
-  rowwise() %>%
-  mutate(avg_sd = mean(c(A.CT.sd, B.CT.sd, C.CT.sd, D.CT.sd), na.rm = TRUE)) %>%
-  group_by(Sample.Name) %>%
-  dplyr::filter(avg_sd == min(avg_sd)) 
+KEY_dupes_initial <- KEY_dupes_dat %>%
+  filter(time_point == "initial")
 
-# Raw Data with no replicates
-qpcr_good <- qpcr_data %>%
-  filter(!(Sample.Name %in% dupes$Sample.Name))
+KEY_H_single <- KEY_healthy %>%
+  filter(!(Sample.Name %in% KEY_dupes_dat$Sample.Name))
 
+KEY_Ofav <- rbind(KEY_dupes_initial, KEY_H_single) %>%
+  select(Sample.Name, site, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  mutate(region = case_when(grepl("LK", site) ~ "Lower_Keys",grepl("UK", site) ~ "Upper_Keys"))
 
-# Cleaned dataset from data that worked the first run and "clean" replicates 
-Ofav_good <- qpcr_good %>%
-  bind_rows(Ofav_dupes_f2)
-
-
-need_2_clean <- Ofav_good %>%
-  group_by(Sample.Name) %>%
-  count(vars = "Sample.Name") %>%
-  filter(n > 1) 
-
-# Which Samples Were Duplicated and Still Need to be Rerun?
-setdiff(Ofav_dupes$Sample.Name, Ofav_dupes_f2$Sample.Name)
-# EX066, Ex0249 won't produce 2 technical replicates for symbionts
-# EX0188 failed and do not have rerun data 
-
-setdiff(fails$Sample.Name, Ofav_good$Sample.Name)
-
-# Samples that need to be rerun
-setdiff(reruns$Sample.Name, Ofav_dupes_f2$Sample.Name)
 ```
+
+#Import Karp Miami and Karp Dry Tortugas 
+```{r}
+MIA1 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Emerald_Reef.xlsx") %>%
+  filter(SampleName != NaN) 
+
+MIA1_Ofav <- MIA1 %>%
+  filter(Species == "Ofav") %>%
+  select(Sample.Name = SampleName, site = Reef, depth = depth_m, A.D, B.D, C.D, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
+  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps)
+
+MIA2 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Fisher_Island.xlsx") %>%
+  filter(SampleName != NaN)
+
+MIA2_Ofav <- MIA2 %>% 
+ filter(Species == "Ofav") %>%
+  select(Sample.Name = SampleName, site = Location, A.D, B.D, C.D, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
+  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
+  mutate(depth = NaN)
+
+DRT1 <- readxl::read_xlsx("Data/Karp_Dry_Tortugas/Karp_Dry_Tortugas.xlsx") %>%
+  filter(Sample.Name != NaN)
+
+DRT <- DRT1 %>%
+  filter(Species == "OFAV") %>%
+  select(Sample.Name, depth = depth_m, A.D, B.D, C.D, A.CT.mean,B.CT.mean, C.CT.mean, D.CT.mean,
+  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
+  mutate(site = "Dry_Tortugas") %>%
+  mutate(region = "Dry_Tortugas")
+
+
+```
+
+
+# Calculating Symbiont Proportions for Karp Data 
+```{r}
+karp <- rbind(MIA1_Ofav, MIA2_Ofav) %>%
+  mutate(region = "Miami") %>%
+  rbind(DRT) %>%
+  filter(D.CT.mean == NaN)
+  
+
+ karp_NA_0 <- karp %>% 
+   mutate(A.D = as.numeric(A.D),
+         B.D = as.numeric(B.D),
+         C.D = as.numeric(C.D),
+         D.CT.mean = as.numeric(D.CT.mean)) %>%
+     mutate(A.D = ifelse(is.na(A.D), 0, A.D),
+         B.D = ifelse(is.na(B.D), 0, B.D),
+         C.D = ifelse(is.na(C.D), 0, C.D),
+         D.CT.mean = ifelse(is.na(D.CT.mean), 0, D.CT.mean))
+ 
+ 
+ karp_D <- karp_NA_0 %>%
+   mutate(D.D = case_when(D.CT.mean > 1 ~ 1)) %>%
+   mutate(D.D = ifelse(is.na(D.D), 0, D.D))
+
+
+y <- karp_D %>%
+  mutate(total = A.D + B.D + C.D + D.D) %>%
+  mutate(A.prop = A.D/total,
+         B.prop = B.D/total,
+         C.prop = C.D/total,
+         D.prop = D.D/total) %>%
+  select(A.D, B.D, C.D,D.D, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.prop, B.prop, C.prop, D.prop, total)
+```
+
+# Import Williamson Data
+```{r}
+WEL <- readxl::read_xlsx("Data/Williamson_Eluthera/Williamson_Eluthera.xlsx")
+
+
+WER <- readxl::read_xlsx("Data/Williamson_Emerald_Reef/Williamson_Emerald_Reef.xlsx")
+
+
+WEL_Ofav <- WEL %>%
+  select(Sample.Name, region, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.reps, B.reps, C.reps, D.reps, A.B, A.C, A.D, B.C, B.D, C.D, D.nonD)
+
+
+
+```
+
+# Combine Karp and Williamson Data 
+```{r}
+
+# Combine Data
+# Clean out Bad replicates 
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Convert Clade to Genera names, Convert NA proportions to 0
 ```{r}
@@ -212,21 +245,9 @@ EXAB_Ofav <- Ofav_good %>%
 
 ```
 
-#Import Green Curacao 2014 Data 
-```{r}
-CUR <- readxl::read_xlsx(path = "Data/Green_Curacao_2014/ITS2_green_curacao_data.xlsx") 
 
-CUR_Ofav <- CUR %>%
-  select(Sample.Name = sample_name, depth = depth_m, Symbiodinium = A, Breviolum = B, Cladocopium = C, Gerakladium = G)%>%
-  mutate("Durusdinium" = 0) %>%
-  select(Sample.Name, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
-  mutate(region = "Curacao", site = NA)
-  
-```
-
-# Import Manzello Florida Keys 2019 Data
+# Extra Manzello Analysis, determing which samples to use
 ```{r}
-KEY <- readxl::read_xlsx(path = "Data/Manzello_Florida_Keys_2019/qPCR_Raw_Data_FL_Keys_2015-2016.xlsx")
 
 KEY_fig_dat <- KEY %>%
   select(Sample.Name, time_point, condition, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
@@ -280,7 +301,6 @@ KEY_Ofav <- rbind(KEY_dupes_initial, KEY_H_single) %>%
   select(Sample.Name, site, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
   mutate(region = case_when(grepl("LK", site) ~ "Lower_Keys",grepl("UK", site) ~ "Upper_Keys"))
 
-
 KEY_Samps <- KEY_Ofav %>%
   select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
   gather(key = sym, value = value, -Sample.Name)
@@ -290,91 +310,18 @@ ggplot(KEY_Samps, aes(x = Sample.Name, y = value, fill = sym)) +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c')) +
   theme(legend.position = "bottom")
 
- ggsave(filename = "healthy_KEYS.png", width = 84, height = 100, units = "mm")
+ #ggsave(filename = "healthy_KEYS.png", width = 84, height = 100, units = "mm")
 
 
 
 ```
 
-# Import Karp Miami Data
-```{r}
-MIA1 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Emerald_Reef.xlsx") %>%
-  filter(SampleName != NaN) 
-
-MIA2 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Fisher_Island.xlsx") %>%
-  filter(SampleName != NaN) 
-
-MIA3 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Dry_Tortugas.xlsx") %>%
-  filter(Sample.Name != NaN)
-
-# Renaming and selecting columns from Raw Data Files
-MIA1_Ofav <- MIA1 %>%
-  filter(Species == "Ofav") %>%
-  select(Sample.Name = SampleName, site = Reef, depth = depth_m, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
-  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
-  mutate(A.CT.mean = as.numeric(A.CT.mean),
-         B.CT.mean = as.numeric(B.CT.mean),
-         C.CT.mean = as.numeric(C.CT.mean),
-         D.CT.mean = as.numeric(D.CT.mean)) %>%
-  mutate(region = "Miami")
-
-MIA2_Ofav <- MIA2 %>% 
- filter(Species == "Ofav") %>%
-  select(Sample.Name = SampleName, site = Location, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
-  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
-  mutate(A.CT.mean = as.numeric(A.CT.mean),
-         B.CT.mean = as.numeric(B.CT.mean),
-         C.CT.mean = as.numeric(C.CT.mean),
-         D.CT.mean = as.numeric(D.CT.mean)) %>%
-  mutate(depth = NaN) %>%
-  mutate(region = "Miami")
-
-MIA3_Ofav <- MIA3 %>%
-  filter(Species == "OFAV") %>%
-  select(Sample.Name, A.CT.mean, depth = depth_m, B.CT.mean, C.CT.mean, D.CT.mean,
-  A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
-   mutate(A.CT.mean = as.numeric(A.CT.mean),
-         B.CT.mean = as.numeric(B.CT.mean),
-         C.CT.mean = as.numeric(C.CT.mean),
-         D.CT.mean = as.numeric(D.CT.mean)) %>%
-  mutate(site = "Dry_Tortugas") %>%
-  mutate(region = "Dry_Tortugas")
-
-#Combining all 3 MIA Datasets 
-qpcr_MIA_Ofav <- rbind(MIA1_Ofav, MIA2_Ofav, MIA3_Ofav) %>%
-  filter(A.reps != 1, B.reps != 1, C.reps != 1, D.reps != 1)
-
-
-# adjust CT to form ratio of Symbiont divided by Copy # (Currently a Placeholder #)
-MIA_copy_num <- qpcr_MIA_Ofav %>%
-  mutate(N = 15) %>%
-  mutate(A.N = 2^(N - A.CT.mean)/1,
-         B.N = 2^(N - B.CT.mean)/1,
-         C.N = 2^(N - C.CT.mean)/1,
-         D.N = 2^(N - D.CT.mean)/1)
-
-# Convert Na to 0
-MIA_qpcr_prop <- MIA_copy_num %>%
-  mutate(A.N = ifelse(is.na(A.N), 0, A.N),
-         B.N = ifelse(is.na(B.N), 0, B.N),
-         C.N = ifelse(is.na(C.N), 0, C.N),
-         D.N = ifelse(is.na(D.N), 0, D.N)) %>%
-  rowwise() %>%
-  mutate(total = sum(A.N + B.N + C.N + D.N))%>%
-  mutate(A.prop = A.N/total, B.prop = B.N/total, C.prop = C.N/total, D.prop = D.N/total)
-
-# Renaming Clade Proportion to Genus Proportion 
-MIA_Ofav <- MIA_qpcr_prop %>%
-  select(Sample.Name, region, site, depth, Symbiodinium = A.prop, Breviolum = B.prop, Cladocopium = C.prop, Durusdinium = D.prop) %>%
-  mutate(depth = NA)
-
-```
 
 
 
 # Combining Exumas, Abacao, Curaco, Florida Keys & establishing Dominant Symbiont
 ```{r}
-Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav) %>%
+Ofav<- rbind(EXAB_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav, DRT_Ofav) %>%
   filter(Sample.Name != "NEC6", Sample.Name != "PTC") %>% # GO BACK AND SEE WHY THESE SLIP THROUGH
   mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
                              ~ "Breviolum",
@@ -687,6 +634,7 @@ symbiont_pres <- distinct_combos %>%
 
 ```
 
+#Histogram of Coral Sample Degree 
 ```{r}
 dom_sym <- Ofav %>%
   select(Sample.Name, dom_sym) %>%
@@ -706,25 +654,10 @@ hist <- symbiont_pres %>%
    theme_bw()
   
 
-
-
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
-Ofav
-
 Ofav_pa <- Ofav %>%
   select(Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
   mutate_at(vars(Symbiodinium, Breviolum, Cladocopium, Durusdinium), 

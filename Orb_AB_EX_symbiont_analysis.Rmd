@@ -49,10 +49,10 @@ qpcr_AB <- AB %>%
 #Import Karp Miami and Karp Dry Tortugas 
 ```{r}
 MIA1 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Emerald_Reef.xlsx") %>%
-  filter(Species == "Ofav")
+  filter(Species == "Ofav") %>%
   filter(SampleName != NaN) 
 
-MIA1_Ofav <- MIA1 %>%
+MIA1_qpcr <- MIA1 %>%
   filter(Species == "Ofav") %>%
   select(Sample.Name = SampleName, site = Reef, depth = depth_m, A.D, B.D, C.D, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
   A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps)
@@ -60,7 +60,7 @@ MIA1_Ofav <- MIA1 %>%
 MIA2 <- readxl::read_xlsx("Data/Karp_Miami_Unpublished/Karp_Fisher_Island.xlsx") %>%
   filter(SampleName != NaN)
 
-MIA2_Ofav <- MIA2 %>% 
+MIA2_qpcr <- MIA2 %>% 
  filter(Species == "Ofav") %>%
   select(Sample.Name = SampleName, site = Location, A.D, B.D, C.D, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean,
   A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
@@ -69,16 +69,16 @@ MIA2_Ofav <- MIA2 %>%
 DRT1 <- readxl::read_xlsx("Data/Karp_Dry_Tortugas/Karp_Dry_Tortugas.xlsx") %>%
   filter(Sample.Name != NaN)
 
-DRT <- DRT1 %>%
+DRT_qpcr <- DRT1 %>%
   filter(Species == "OFAV") %>%
   select(Sample.Name, depth = depth_m, A.D, B.D, C.D, A.CT.mean,B.CT.mean, C.CT.mean, D.CT.mean,
   A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps) %>%
   mutate(site = "Dry_Tortugas") %>%
   mutate(region = "Dry_Tortugas")
 
-qpcr_karp <- rbind(MIA1_Ofav, MIA2_Ofav) %>%
+qpcr_karp <- rbind(MIA1_qpcr, MIA2_qpcr) %>%
   mutate(region = "Miami") %>%
-  rbind(DRT) %>%
+  rbind(DRT_qpcr) %>%
   select(Sample.Name, region, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps ) %>%
       mutate(A.CT.mean = as.numeric(A.CT.mean),
          B.CT.mean = as.numeric(B.CT.mean),
@@ -92,7 +92,7 @@ qpcr_karp <- rbind(MIA1_Ofav, MIA2_Ofav) %>%
 ```{r}
 WEL1 <- readxl::read_xlsx("Data/Williamson_Eluthera/Williamson_Eluthera.xlsx")
 
-WEL<- WEL1 %>%
+WEL_qpcr<- WEL1 %>%
   select(Sample.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.reps, B.reps, C.reps, D.reps ) %>%
   mutate(region = "Eluthera")
 
@@ -100,38 +100,22 @@ WEL<- WEL1 %>%
 WER1 <- readxl::read_xlsx("Data/Williamson_Emerald_Reef/Williamson_Emerald_Reef.xlsx")
 
 
-WER <- WER1 %>% 
+WER_qpcr <- WER1 %>% 
   select(Sample.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.reps, B.reps, C.reps, D.reps) %>%
   mutate(region = "Miami")
 
-qpcr_williamson <- rbind(WEL, WER) %>%
+qpcr_williamson <- rbind(WEL_qpcr, WER_qpcr) %>%
   mutate(A.CT.sd = 0, B.CT.sd = 0, C.CT.sd = 0, D.CT.sd = 0)
 
-```
-
-```{r}
-need_to_clean <- rbind(qpcr_AB, qpcr_karp, qpcr_williamson) %>%
-    mutate(A.CT.mean = ifelse(is.na(A.CT.mean), 0, A.CT.mean),
-         B.CT.mean = ifelse(is.na(B.CT.mean), 0, B.CT.mean),
-         C.CT.mean = ifelse(is.na(C.CT.mean), 0, C.CT.mean),
-         D.CT.mean = ifelse(is.na(D.CT.mean), 0, D.CT.mean))
-
-fails <- need_to_clean %>%
-  filter(A.CT.mean == 0 & B.CT.mean == 0 & C.CT.mean == 0 & D.CT.mean == 0)
-  
-tidy <- need_to_clean %>%
-  filter(!Sample.Name %in% fails$Sample.Name) %>%
-  filter(A.reps != 1 , B.reps != 1 , C.reps != 1 , D.reps != 1) %>%
-  filter(A.CT.sd < 1 | B.CT.sd < 1 | C.CT.sd < 1 | D.CT.sd < 1)
-  
 ```
 
 
 # Establishing Proportions for Abaco, Karp, and Williamson Data
 ```{r}
+prop_calc <- rbind(qpcr_AB, qpcr_karp, qpcr_williamson)
 
 # adjust CT to form ratio of Symbiont divided by Copy # (Currently a Placeholder #)
-qpcr_copy_num <- tidy %>%
+qpcr_copy_num <- prop_calc %>%
   mutate(N = 15) %>%
   mutate(A.N = 2^(N - A.CT.mean)/1,
          B.N = 2^(N - B.CT.mean)/1,
@@ -151,32 +135,92 @@ qpcr_prop <- qpcr_copy_num %>%
          Durusdinium = D.N/total) 
 ```
 
+
+
+```{r}
+need_to_clean <-qpcr_prop %>%
+    mutate(A.CT.mean = ifelse(is.na(A.CT.mean), 0, A.CT.mean),
+         B.CT.mean = ifelse(is.na(B.CT.mean), 0, B.CT.mean),
+         C.CT.mean = ifelse(is.na(C.CT.mean), 0, C.CT.mean),
+         D.CT.mean = ifelse(is.na(D.CT.mean), 0, D.CT.mean))
+
+fails <- need_to_clean %>%
+  filter(A.CT.mean == 0 & B.CT.mean == 0 & C.CT.mean == 0 & D.CT.mean == 0)
+  
+tidy_qpcr <- need_to_clean %>%
+  filter(!Sample.Name %in% fails$Sample.Name) %>%
+  filter(A.reps != 1 , B.reps != 1 , C.reps != 1 , D.reps != 1) %>%
+  filter(A.CT.sd < 1 | B.CT.sd < 1 | C.CT.sd < 1 | D.CT.sd < 1)
+  
+```
+
+
 # Abaco (Parker)
 ```{r}
-AB_Ofav <- qpcr_prop %>%
+AB_Ofav <- tidy_qpcr %>%
   filter(region == "Abaco") %>%
-  select(Sample.Name, site, region, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+  select(Sample.Name, site, region, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium) 
+
+AB_comp <- AB_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = "sym", value = "value", -Sample.Name) 
+
+ggplot(AB_comp, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
+
 ```
 
 # Miami (Karp & Williamson)
 ```{r}
-MIA_Ofav <- qpcr_prop %>%
+MIA_Ofav <- tidy_qpcr %>%
   filter(region == "Miami") %>%
   select(Sample.Name, site, region, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+MIA_comp <- MIA_Ofav %>%
+  select(Sample.Name, site, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = "sym", value = "value", -Sample.Name, -site) 
+
+ggplot(MIA_comp, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_grid(~ site, scales = "free") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
 ```
 
 # Dry Tortugas (Karp)
 ```{r}
-DRT_Ofav <- qpcr_prop %>%
+DRT_Ofav <- tidy_qpcr %>%
   filter(region == "Dry_Tortugas") %>%
   select(Sample.Name, site, region, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+DRT_comp <- DRT_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = "sym", value = "value", -Sample.Name) 
+
+
+ggplot(DRT_comp, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
 ```
 
 # Eluthera (Williamson)
 ```{r}
-ELU <- qpcr_prop %>%
+ELU_Ofav <- tidy_qpcr %>%
   filter(region == "Eluthera") %>%
-  select(Sample.Name, site, region, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+  select(Sample.Name, site, region, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+ELU_comp <- ELU_Ofav %>%
+  select(Sample.Name, site, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = "sym", value = "value", -Sample.Name, -site) 
+
+
+ggplot(ELU_comp, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_grid(~ site, scales = "free") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
 ```
 
 # Import Exumas Data 
@@ -188,7 +232,18 @@ EX_Ofav <- EX %>%
   mutate(region = "Exumas") %>%
   select(Sample.Name, site, region, depth, Symbiodinium = A.prop, Breviolum = B.prop, 
          Cladocopium = C.prop, Durusdinium = D.prop) 
+
+EX_comp <- EX_Ofav %>%
+  select(Sample.Name, site, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = "sym", value = "value", -Sample.Name, -site) 
+
+
+ggplot(EX_comp, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_wrap(~ site, scales = "free") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
 ```
+
 
 #Import Green Curacao 2014 Data 
 ```{r}
@@ -200,6 +255,15 @@ CUR_Ofav <- CUR %>%
   select(Sample.Name, depth, Symbiodinium = A.prop, Breviolum = B.prop, 
          Cladocopium = C.prop, Durusdinium = D.prop) %>%
   mutate(region = "Curacao", site = "Curacao")
+
+CUR_comp <- CUR_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  gather(key = "sym", value = "value", -Sample.Name) 
+
+
+ggplot(CUR_comp, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
   
 ```
 
@@ -230,13 +294,24 @@ KEY_Ofav <- rbind(KEY_dupes_initial, KEY_H_single) %>%
   select(Sample.Name, site, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
   mutate(region = case_when(grepl("LK", site) ~ "Lower_Keys",grepl("UK", site) ~ "Upper_Keys"))
 
+KEY_comp <- KEY_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium, region) %>%
+  gather(key = "sym", value = "value", -Sample.Name, -region) 
+
+
+ggplot(KEY_comp, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_wrap(~ region, scales = "free") +
+  scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
+
 ```
 
 
 
 # Combining Exumas, Abacao, Curaco, Florida Keys & establishing Dominant Symbiont
 ```{r}
-Ofav<- rbind(AB_Ofav, EX_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav, DRT_Ofav) %>%
+Ofav<- rbind(AB_Ofav, EX_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav, DRT_Ofav, ELU_Ofav) %>%
   mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
                              ~ "Breviolum",
                              Cladocopium > Breviolum & Cladocopium > Durusdinium & Cladocopium > Symbiodinium
@@ -340,11 +415,7 @@ ggplot(KEY_Samps, aes(x = Sample.Name, y = value, fill = sym)) +
 
  #ggsave(filename = "healthy_KEYS.png", width = 84, height = 100, units = "mm")
 
-
-
 ```
-
-
 
 
 # Stacked Bar Plot of Symbiont Composition per Sample  
@@ -362,6 +433,8 @@ ggplot(all_sym_comp, aes(x = Sample.Name, y = value, fill = sym)) +
 
 #Dominant Symbiont Proportion across Depth
 ```{r}
+Ofav$depth <- as.numeric(as.character(Ofav$depth))
+
 dom_sym <- Ofav %>%
   select(Sample.Name, depth, dom_sym) %>%
   filter(depth != "NA") %>%

@@ -161,6 +161,7 @@ AB_Ofav <- tidy_qpcr %>%
   filter(region == "Abaco") %>%
   select(Sample.Name, site, region, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium) 
 
+# Symbiodiniaceae composition per sample Abaco
 AB_comp <- AB_Ofav %>%
   select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
   gather(key = "sym", value = "value", -Sample.Name) 
@@ -169,6 +170,45 @@ ggplot(AB_comp, aes(x = Sample.Name, y = value, fill = sym)) +
   geom_bar(stat = "identity", position = "fill") +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
 
+# Network Symbiodiniaceae Abaco
+library(igraph)
+
+AB_net_data <- AB_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+AB_edges <- AB_net_data %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+AB_depth <- AB_Ofav %>%
+  select(Sample.Name, depth)
+
+AB_depth$depth <- as.numeric(as.character(AB_depth$depth))
+
+AB_verts <- tibble(Sample.Name = c(AB_net_data$Sample.Name, colnames(AB_net_data)[-1])) %>%
+  left_join(AB_depth) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+AB_net <- graph_from_data_frame(AB_edges, directed = FALSE, vertices = AB_verts)
+
+set.seed(8)
+
+plot(AB_net, edge.curved = 0,
+     edge.width = 2 * (E(AB_net)$weight)^0.4, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(AB_net)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl(".*um", names(V(AB_net))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(AB_net))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(AB_net)$depth,breaks = 100))]))
+
 
 ```
 
@@ -176,7 +216,8 @@ ggplot(AB_comp, aes(x = Sample.Name, y = value, fill = sym)) +
 ```{r}
 MIA_Ofav <- tidy_qpcr %>%
   filter(region == "Miami") %>%
-  select(Sample.Name, site, region, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+  select(Sample.Name, site, region, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  filter(Sample.Name != "ofav94")
 
 MIA_comp <- MIA_Ofav %>%
   select(Sample.Name, site, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
@@ -186,6 +227,44 @@ ggplot(MIA_comp, aes(x = Sample.Name, y = value, fill = sym)) +
   geom_bar(stat = "identity", position = "fill") +
   facet_grid(~ site, scales = "free") +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
+# Network Curacao
+MIA_net_data <- MIA_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+MIA_edges <- MIA_net_data %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+MIA_depth <- MIA_Ofav %>%
+  select(Sample.Name, depth)
+
+MIA_depth$depth <- as.numeric(as.character(MIA_depth$depth))
+
+MIA_verts <- tibble(Sample.Name = c(MIA_net_data$Sample.Name, colnames(MIA_net_data)[-1])) %>%
+  left_join(MIA_depth) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+MIA_net <- graph_from_data_frame(MIA_edges, directed = FALSE, vertices = MIA_verts)
+
+set.seed(8)
+
+plot(MIA_net, edge.curved = 0,
+     edge.width = 2 * (E(MIA_net)$weight)^0.4, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(MIA_net)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl(".*um", names(V(MIA_net))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(MIA_net))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(MIA_net)$depth,breaks = 100))]))
+
 ```
 
 # Dry Tortugas (Karp)
@@ -203,6 +282,43 @@ ggplot(DRT_comp, aes(x = Sample.Name, y = value, fill = sym)) +
   geom_bar(stat = "identity", position = "fill") +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
 
+
+#Network Dry Tortugas
+DRT_net_data <- DRT_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+DRT_edges <- DRT_net_data %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+DRT_depth <- DRT_Ofav %>%
+  select(Sample.Name, depth)
+
+DRT_depth$depth <- as.numeric(as.character(DRT_depth$depth))
+
+DRT_verts <- tibble(Sample.Name = c(DRT_net_data$Sample.Name, colnames(DRT_net_data)[-1])) %>%
+  left_join(DRT_depth) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+DRT_net <- graph_from_data_frame(DRT_edges, directed = FALSE, vertices = DRT_verts)
+
+set.seed(8)
+
+plot(DRT_net, edge.curved = 0,
+     edge.width = 2 * (E(DRT_net)$weight)^0.4, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(DRT_net)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl(".*um", names(V(DRT_net))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(DRT_net))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(DRT_net)$depth,breaks = 100))]))
 ```
 
 # Eluthera (Williamson)
@@ -220,6 +336,44 @@ ggplot(ELU_comp, aes(x = Sample.Name, y = value, fill = sym)) +
   geom_bar(stat = "identity", position = "fill") +
   facet_grid(~ site, scales = "free") +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
+
+#Network Eluthera
+ELU_net_data <- ELU_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+ELU_edges <- ELU_net_data %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+ELU_depth <- ELU_Ofav %>%
+  select(Sample.Name, depth)
+
+ELU_depth$depth <- as.numeric(as.character(ELU_depth$depth))
+
+ELU_verts <- tibble(Sample.Name = c(ELU_net_data$Sample.Name, colnames(ELU_net_data)[-1])) %>%
+  left_join(ELU_depth) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+ELU_net <- graph_from_data_frame(ELU_edges, directed = FALSE, vertices = ELU_verts)
+
+set.seed(8)
+
+plot(ELU_net, edge.curved = 0,
+     edge.width = 2 * (E(ELU_net)$weight)^0.4, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(ELU_net)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl(".*um", names(V(ELU_net))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(ELU_net))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(ELU_net)$depth,breaks = 100))]))
 
 ```
 
@@ -242,6 +396,46 @@ ggplot(EX_comp, aes(x = Sample.Name, y = value, fill = sym)) +
   geom_bar(stat = "identity", position = "fill") +
   facet_wrap(~ site, scales = "free") +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
+
+#Network Exumas
+
+EX_net_data <- EX_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+EX_edges <- EX_net_data %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+EX_depth <- EX_Ofav %>%
+  select(Sample.Name, depth)
+
+EX_depth$depth <- as.numeric(as.character(EX_depth$depth))
+
+EX_verts <- tibble(Sample.Name = c(EX_net_data$Sample.Name, colnames(EX_net_data)[-1])) %>%
+  left_join(EX_depth) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+EX_net <- graph_from_data_frame(EX_edges, directed = FALSE, vertices = EX_verts)
+
+set.seed(8)
+
+plot(EX_net, edge.curved = 0,
+     edge.width = 2 * (E(EX_net)$weight)^0.4, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(EX_net)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl(".*um", names(V(EX_net))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(EX_net))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(EX_net)$depth,breaks = 100))]))
+
 ```
 
 
@@ -264,7 +458,44 @@ CUR_comp <- CUR_Ofav %>%
 ggplot(CUR_comp, aes(x = Sample.Name, y = value, fill = sym)) +
   geom_bar(stat = "identity", position = "fill") +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
-  
+
+# Network Curacao
+CUR_net_data <- CUR_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+CUR_edges <- CUR_net_data %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+CUR_depth <- CUR_Ofav %>%
+  select(Sample.Name, depth)
+
+CUR_depth$depth <- as.numeric(as.character(CUR_depth$depth))
+
+CUR_verts <- tibble(Sample.Name = c(CUR_net_data$Sample.Name, colnames(CUR_net_data)[-1])) %>%
+  left_join(CUR_depth) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+CUR_net <- graph_from_data_frame(CUR_edges, directed = FALSE, vertices = CUR_verts)
+
+set.seed(8)
+
+plot(CUR_net, edge.curved = 0,
+     edge.width = 2 * (E(CUR_net)$weight)^0.4, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(CUR_net)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl(".*um", names(V(CUR_net))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(CUR_net))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(CUR_net)$depth,breaks = 100))]))
+
 ```
 
 #Import Manzello Data 
@@ -303,6 +534,44 @@ ggplot(KEY_comp, aes(x = Sample.Name, y = value, fill = sym)) +
   geom_bar(stat = "identity", position = "fill") +
   facet_wrap(~ region, scales = "free") +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
+
+
+# Network Florida Keys
+KEY_net_data <- KEY_Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+KEY_edges <- KEY_net_data %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+KEY_depth <- KEY_Ofav %>%
+  select(Sample.Name, depth)
+
+KEY_depth$depth <- as.numeric(as.character(KEY_depth$depth))
+
+KEY_verts <- tibble(Sample.Name = c(KEY_net_data$Sample.Name, colnames(KEY_net_data)[-1])) %>%
+  left_join(KEY_depth) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+KEY_net <- graph_from_data_frame(KEY_edges, directed = FALSE, vertices = KEY_verts)
+
+set.seed(8)
+
+plot(KEY_net, edge.curved = 0,
+     edge.width = 2 * (E(KEY_net)$weight)^0.4, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(KEY_net)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl(".*um", names(V(KEY_net))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(KEY_net))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(KEY_net)$depth,breaks = 100))]))
 
 
 ```
@@ -738,6 +1007,8 @@ hist <- symbiont_pres %>%
   
 
 ```
+
+
 
 
 ```{r}

@@ -93,7 +93,7 @@ qpcr_karp <- rbind(MIA1_qpcr, MIA2_qpcr) %>%
 WEL1 <- readxl::read_xlsx("Data/Williamson_Eluthera/Williamson_Eluthera.xlsx")
 
 WEL_qpcr<- WEL1 %>%
-  select(Sample.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.reps, B.reps, C.reps, D.reps) %>%
+  select(Sample.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.reps, B.reps, C.reps, D.reps, A.D, B.D, C.D) %>%
   mutate(region = "Eluthera")
 
 
@@ -101,23 +101,33 @@ WER1 <- readxl::read_xlsx("Data/Williamson_Emerald_Reef/Williamson_Emerald_Reef.
 
 
 WER_qpcr <- WER1 %>% 
-  select(Sample.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.reps, B.reps, C.reps, D.reps) %>%
+  select(Sample.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.reps, B.reps, C.reps, D.reps, A.D, B.D, C.D) %>%
   mutate(region = "Miami")
 
-qpcr_williamson <- rbind(WEL_qpcr, WER_qpcr) %>%
-  mutate(A.CT.sd = 0, B.CT.sd = 0, C.CT.sd = 0, D.CT.sd = 0) 
+williamson_qpcr <- rbind(WEL_qpcr, WER_qpcr) %>%
+  mutate(A.CT.sd = 0, B.CT.sd = 0, C.CT.sd = 0, D.CT.sd = 0) %>% 
+  mutate(A.D = as.numeric(A.D),
+         B.D = as.numeric(B.D),
+         C.D = as.numeric(C.D),
+         D.D = as.numeric(1)) %>%
+  mutate(A.D = ifelse(is.na(A.D), 0, A.D),
+         B.D = ifelse(is.na(B.D), 0, B.D),
+         C.D = ifelse(is.na(C.D), 0, C.D))
+ 
 
-prop_williamson <- qpcr_williamson %>%
-  
-
-
-
+williamson_prop <- williamson_qpcr %>%
+  mutate(total = A.D + B.D + C.D + D.D) %>%
+  mutate(A.prop = A.D/total,
+         B.prop = B.D/total,
+         C.prop = C.D/total, 
+         D.prop = D.D/total) %>%
+  select(Sample.Name, region, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd, B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps, Symbiodinium = A.prop, Breviolum = B.prop, Cladocopium = C.prop, Durusdinium = D.prop)
 ```
 
 
 # Establishing Proportions for Abaco, Karp, and Williamson Data
 ```{r}
-prop_calc <- rbind(qpcr_AB, qpcr_karp, qpcr_williamson)
+prop_calc <- rbind(qpcr_AB, qpcr_karp)
 
 # adjust CT to form ratio of Symbiont divided by Copy # (Currently a Placeholder #)
 qpcr_copy_num <- prop_calc %>%
@@ -143,6 +153,9 @@ qpcr_prop <- qpcr_copy_num %>%
 
 ```{r}
 need_to_clean <-qpcr_prop %>%
+  select(Sample.Name, region, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd, B.CT.sd, C.CT.sd, 
+         D.CT.sd, A.reps, B.reps, C.reps, D.reps, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
+  rbind(williamson_prop) %>%
     mutate(A.CT.mean = ifelse(is.na(A.CT.mean), 0, A.CT.mean),
          B.CT.mean = ifelse(is.na(B.CT.mean), 0, B.CT.mean),
          C.CT.mean = ifelse(is.na(C.CT.mean), 0, C.CT.mean),

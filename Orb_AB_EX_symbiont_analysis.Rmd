@@ -38,7 +38,7 @@ AB <- AB1 %>%
 
 
 # adjust CT for flouresence 
-qpcr_AB <- AB %>%
+AB_qpcr <- AB %>%
   mutate(A.CT.mean = A.CT.mean - 1,
          B.CT.mean = B.CT.mean - 1,
          C.CT.mean = C.CT.mean - 1,
@@ -76,7 +76,7 @@ DRT_qpcr <- DRT1 %>%
   mutate(site = "Dry_Tortugas") %>%
   mutate(region = "Dry_Tortugas")
 
-qpcr_karp <- rbind(MIA1_qpcr, MIA2_qpcr) %>%
+karp_qpcr <- rbind(MIA1_qpcr, MIA2_qpcr) %>%
   mutate(region = "Miami") %>%
   rbind(DRT_qpcr) %>%
   select(Sample.Name, region, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.CT.sd,B.CT.sd, C.CT.sd, D.CT.sd, A.reps, B.reps, C.reps, D.reps ) %>%
@@ -127,7 +127,7 @@ williamson_prop <- williamson_qpcr %>%
 
 # Establishing Proportions for Abaco, Karp, and Williamson Data
 ```{r}
-prop_calc <- rbind(qpcr_AB, qpcr_karp)
+prop_calc <- rbind(AB_qpcr, karp_qpcr)
 
 # adjust CT to form ratio of Symbiont divided by Copy # (Currently a Placeholder #)
 qpcr_copy_num <- prop_calc %>%
@@ -233,7 +233,9 @@ plot(AB_net, edge.curved = 0,
 MIA_Ofav <- tidy_qpcr %>%
   filter(region == "Miami") %>%
   select(Sample.Name, site, region, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
-  filter(Sample.Name != "ofav94")
+  filter(Sample.Name != "ofav94") %>%
+  mutate(site = ifelse(site == "Emerald", "Emerald_Reef", site)) %>%
+  mutate(site = ifelse(site == "Emerald Reef", "Emerald_Reef", site))
 
 MIA_comp <- MIA_Ofav %>%
   select(Sample.Name, site, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
@@ -709,11 +711,9 @@ ggplot(all_sym_comp, aes(x = Sample.Name, y = value, fill = sym)) +
 
 #Dominant Symbiont Proportion across Depth
 ```{r}
-Ofav$depth <- as.numeric(as.character(Ofav$depth))
-
 dom_sym <- Ofav %>%
   select(Sample.Name, depth, dom_sym) %>%
-  filter(depth != "NA") %>%
+  filter(depth != "NaN") %>%
   mutate(depth_int = cut(depth, breaks = 8)) %>%
   group_by(depth_int, dom_sym) %>%
   summarise(ncol = n()) %>%
@@ -732,7 +732,7 @@ ggplot(dom_sym, aes(x = as.factor(depth_int), y = ncol, fill = dom_sym)) +
 dom_sym_shallow <- Ofav %>%
   filter(depth < 8) %>%
   select(Sample.Name, depth, dom_sym) %>%
-  filter(depth != "NA") %>%
+  filter(depth != "NaN") %>%
   mutate(depth_int = cut(depth, breaks = 8)) %>%
   group_by(depth_int, dom_sym) %>%
   summarise(ncol = n()) %>%
@@ -996,6 +996,46 @@ symbiont_pres <- distinct_combos %>%
          D = ifelse(D > 0, 1, 0)) %>%
   mutate(degree = A + B + C + D)
 
+
+
+matrix <- symbiont_pres %>%
+  mutate(AA = ifelse(A > 0 & B == 0 & C == 0 & D == 0, 1, 0),
+         BB = ifelse(A == 0 & B > 0 & C == 0 & D == 0, 1, 0),
+         CC = ifelse(A == 0 & B == 0 & C > 0 & D == 0, 1, 0),
+         DD = ifelse(A == 0 & B == 0 & C == 0 & D > 0, 1, 0), 
+         AB = ifelse(A > 0 & B > 0, 1, 0),
+         AC = ifelse(A > 0 & C > 0, 1, 0),
+         AD = ifelse(A > 0 & D > 0, 1, 0),
+         BC = ifelse(B > 0 & C > 0, 1, 0),
+         BD = ifelse(B > 0 & D > 0, 1, 0),
+         CD = ifelse(C > 0 & D > 0, 1, 0),
+         ABC = ifelse(A > 0 & B > 0 & C > 0, 1, 0),
+         ABD = ifelse(A > 0 & B > 0 & D > 0, 1, 0),
+         ACD = ifelse(A > 0 & C > 0 & D > 0, 1, 0),
+         BCD = ifelse(B > 0 & C > 0 & D > 0, 1, 0),
+         ABCD = ifelse( A > 0 & B > 0 & C > 0 & D > 0, 1, 0)) 
+
+
+
+sums <- matrix %>%
+  select(A = AA, B = BB, C = CC, D = DD, AB, AC, AD, BC, BD, CD, ABC, ACD, BCD, ABCD) %>%
+  colSums()
+
+       
+edges <- tribble(
+  ~colA, ~colB, ~weight,
+  "A", "B", 24,
+  "A", "C", 19,
+  "A", "D", 17,
+  "B", "C", 33,
+  "B", "D", 40,
+  "C", "D", 37
+)
+nodes <- c("A", "B", "C", "D")
+
+nn <- graph_from_data_frame(edges, directed = FALSE, vertices = nodes)
+plot(nn, edge.width = E(nn)$weight)
+                    
 ```
 
 #Histogram of Coral Sample Degree 
@@ -1019,6 +1059,8 @@ hist <- symbiont_pres %>%
   
 
 ```
+
+
 
 
 

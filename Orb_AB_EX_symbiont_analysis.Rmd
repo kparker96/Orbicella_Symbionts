@@ -93,7 +93,7 @@ qpcr_karp <- rbind(MIA1_qpcr, MIA2_qpcr) %>%
 WEL1 <- readxl::read_xlsx("Data/Williamson_Eluthera/Williamson_Eluthera.xlsx")
 
 WEL_qpcr<- WEL1 %>%
-  select(Sample.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.reps, B.reps, C.reps, D.reps ) %>%
+  select(Sample.Name, site, depth, A.CT.mean, B.CT.mean, C.CT.mean, D.CT.mean, A.reps, B.reps, C.reps, D.reps) %>%
   mutate(region = "Eluthera")
 
 
@@ -105,7 +105,12 @@ WER_qpcr <- WER1 %>%
   mutate(region = "Miami")
 
 qpcr_williamson <- rbind(WEL_qpcr, WER_qpcr) %>%
-  mutate(A.CT.sd = 0, B.CT.sd = 0, C.CT.sd = 0, D.CT.sd = 0)
+  mutate(A.CT.sd = 0, B.CT.sd = 0, C.CT.sd = 0, D.CT.sd = 0) 
+
+prop_williamson <- qpcr_williamson %>%
+  
+
+
 
 ```
 
@@ -136,7 +141,6 @@ qpcr_prop <- qpcr_copy_num %>%
 ```
 
 
-
 ```{r}
 need_to_clean <-qpcr_prop %>%
     mutate(A.CT.mean = ifelse(is.na(A.CT.mean), 0, A.CT.mean),
@@ -150,7 +154,8 @@ fails <- need_to_clean %>%
 tidy_qpcr <- need_to_clean %>%
   filter(!Sample.Name %in% fails$Sample.Name) %>%
   filter(A.reps != 1 , B.reps != 1 , C.reps != 1 , D.reps != 1) %>%
-  filter(A.CT.sd < 1 | B.CT.sd < 1 | C.CT.sd < 1 | D.CT.sd < 1)
+  filter(A.CT.sd < 1 | B.CT.sd < 1 | C.CT.sd < 1 | D.CT.sd < 1) %>%
+  mutate(depth = as.numeric(as.character(depth)))
   
 ```
 
@@ -183,8 +188,6 @@ AB_edges <- AB_net_data %>%
 
 AB_depth <- AB_Ofav %>%
   select(Sample.Name, depth)
-
-AB_depth$depth <- as.numeric(as.character(AB_depth$depth))
 
 AB_verts <- tibble(Sample.Name = c(AB_net_data$Sample.Name, colnames(AB_net_data)[-1])) %>%
   left_join(AB_depth) %>%
@@ -240,8 +243,6 @@ MIA_edges <- MIA_net_data %>%
 MIA_depth <- MIA_Ofav %>%
   select(Sample.Name, depth)
 
-MIA_depth$depth <- as.numeric(as.character(MIA_depth$depth))
-
 MIA_verts <- tibble(Sample.Name = c(MIA_net_data$Sample.Name, colnames(MIA_net_data)[-1])) %>%
   left_join(MIA_depth) %>%
   rename(id = Sample.Name) %>%
@@ -294,8 +295,6 @@ DRT_edges <- DRT_net_data %>%
 
 DRT_depth <- DRT_Ofav %>%
   select(Sample.Name, depth)
-
-DRT_depth$depth <- as.numeric(as.character(DRT_depth$depth))
 
 DRT_verts <- tibble(Sample.Name = c(DRT_net_data$Sample.Name, colnames(DRT_net_data)[-1])) %>%
   left_join(DRT_depth) %>%
@@ -350,8 +349,6 @@ ELU_edges <- ELU_net_data %>%
 ELU_depth <- ELU_Ofav %>%
   select(Sample.Name, depth)
 
-ELU_depth$depth <- as.numeric(as.character(ELU_depth$depth))
-
 ELU_verts <- tibble(Sample.Name = c(ELU_net_data$Sample.Name, colnames(ELU_net_data)[-1])) %>%
   left_join(ELU_depth) %>%
   rename(id = Sample.Name) %>%
@@ -385,7 +382,8 @@ EX_Ofav <- EX %>%
   filter(species == "faveolata") %>%
   mutate(region = "Exumas") %>%
   select(Sample.Name, site, region, depth, Symbiodinium = A.prop, Breviolum = B.prop, 
-         Cladocopium = C.prop, Durusdinium = D.prop) 
+         Cladocopium = C.prop, Durusdinium = D.prop) %>%
+ mutate(depth = as.numeric(as.character(depth)))
 
 EX_comp <- EX_Ofav %>%
   select(Sample.Name, site, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
@@ -410,8 +408,6 @@ EX_edges <- EX_net_data %>%
 
 EX_depth <- EX_Ofav %>%
   select(Sample.Name, depth)
-
-EX_depth$depth <- as.numeric(as.character(EX_depth$depth))
 
 EX_verts <- tibble(Sample.Name = c(EX_net_data$Sample.Name, colnames(EX_net_data)[-1])) %>%
   left_join(EX_depth) %>%
@@ -448,7 +444,8 @@ CUR_Ofav <- CUR %>%
   mutate("D.prop" = 0) %>%
   select(Sample.Name, depth, Symbiodinium = A.prop, Breviolum = B.prop, 
          Cladocopium = C.prop, Durusdinium = D.prop) %>%
-  mutate(region = "Curacao", site = "Curacao")
+  mutate(region = "Curacao", site = "Curacao") %>%
+  mutate(depth = as.numeric(as.character(depth)))
 
 CUR_comp <- CUR_Ofav %>%
   select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
@@ -470,8 +467,6 @@ CUR_edges <- CUR_net_data %>%
 
 CUR_depth <- CUR_Ofav %>%
   select(Sample.Name, depth)
-
-CUR_depth$depth <- as.numeric(as.character(CUR_depth$depth))
 
 CUR_verts <- tibble(Sample.Name = c(CUR_net_data$Sample.Name, colnames(CUR_net_data)[-1])) %>%
   left_join(CUR_depth) %>%
@@ -523,7 +518,8 @@ KEY_H_single <- KEY_healthy %>%
 
 KEY_Ofav <- rbind(KEY_dupes_initial, KEY_H_single) %>%
   select(Sample.Name, site, depth = depth_m, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
-  mutate(region = case_when(grepl("LK", site) ~ "Lower_Keys",grepl("UK", site) ~ "Upper_Keys"))
+  mutate(region = case_when(grepl("LK", site) ~ "Lower_Keys",grepl("UK", site) ~ "Upper_Keys")) %>%
+  mutate(depth = as.numeric(as.character(depth)))
 
 KEY_comp <- KEY_Ofav %>%
   select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium, region) %>%
@@ -547,8 +543,6 @@ KEY_edges <- KEY_net_data %>%
 
 KEY_depth <- KEY_Ofav %>%
   select(Sample.Name, depth)
-
-KEY_depth$depth <- as.numeric(as.character(KEY_depth$depth))
 
 KEY_verts <- tibble(Sample.Name = c(KEY_net_data$Sample.Name, colnames(KEY_net_data)[-1])) %>%
   left_join(KEY_depth) %>%
@@ -590,11 +584,10 @@ Ofav<- rbind(AB_Ofav, EX_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav, DRT_Ofav, ELU_Ofav)
                              Symbiodinium > Breviolum & Symbiodinium > Cladocopium & Symbiodinium >
                              Durusdinium ~ "Symbiodinium")) %>%
   select(Sample.Name, region, site, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym) %>%
+  mutate(depth = as.numeric(depth)) %>%
   ungroup() 
 
 ```
-
-
 
 
 
@@ -690,12 +683,13 @@ ggplot(KEY_Samps, aes(x = Sample.Name, y = value, fill = sym)) +
 # Stacked Bar Plot of Symbiont Composition per Sample  
 ```{r}
 all_sym_comp <- Ofav %>%
-  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium) %>%
-  gather(key = "sym", value = "value", -Sample.Name) 
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium, region) %>%
+  gather(key = "sym", value = "value", -Sample.Name, -region) 
 
 
 ggplot(all_sym_comp, aes(x = Sample.Name, y = value, fill = sym)) +
   geom_bar(stat = "identity", position = "fill") +
+  facet_wrap(~region, scales = "free") +
   scale_fill_manual(values = c('#a6cee3','#1f78b4','#b2df8a','#33a02c'))
 
 ```
@@ -944,6 +938,8 @@ depth_distinct <- Ofav %>%
   filter(Sample.Name %in% distinct_combos$Sample.Name) %>%
   select(Sample.Name, depth)
 
+depth_distinct$depth <- as.numeric(as.character(depth_distinct$depth))
+
 verts_distinct <- tibble(Sample.Name = c(net_data_distinct$Sample.Name, colnames(net_data_distinct)[-1])) %>%
   left_join(depth_distinct) %>%
   rename(id = Sample.Name) %>%
@@ -971,6 +967,9 @@ ggsave(filename = "distinct_sample_network.png", width = 300, height = 150, unit
 
 ggsave(filename = "distinct_network.png", width = 300, height = 150, units = "mm")
 
+
+
+as_adjacency_matrix(net_distinct, type = c("both"), attr = NULL, edges = TRUE, names = TRUE)
 
 ```
 

@@ -548,39 +548,79 @@ ggplot(KEY_comp, aes(x = Sample.Name, y = value, fill = sym)) +
 
 
 # Network Florida Keys
-KEY_net_data <- KEY_Ofav %>%
+KEY_net_data_u <- KEY_Ofav %>%
+  filter(region == "Upper_Keys") %>%
   select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
 
-KEY_edges <- KEY_net_data %>%
+KEY_edges_u <- KEY_net_data_u %>%
   gather(key = "Genera", value = "weight", -Sample.Name) %>%
   filter(weight != 0) %>%
   mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
 
-KEY_depth <- KEY_Ofav %>%
+KEY_depth_u <- KEY_Ofav %>%
+  filter(region == "Upper_Keys") %>%
   select(Sample.Name, depth)
 
-KEY_verts <- tibble(Sample.Name = c(KEY_net_data$Sample.Name, colnames(KEY_net_data)[-1])) %>%
-  left_join(KEY_depth) %>%
+KEY_verts_u <- tibble(Sample.Name = c(KEY_net_data_u$Sample.Name, colnames(KEY_net_data_u)[-1])) %>%
+  left_join(KEY_depth_u) %>%
   rename(id = Sample.Name) %>%
   mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
   select(id, depth, lab)
 
-KEY_net <- graph_from_data_frame(KEY_edges, directed = FALSE, vertices = KEY_verts)
+KEY_net_u <- graph_from_data_frame(KEY_edges_u, directed = FALSE, vertices = KEY_verts_u)
 
 set.seed(8)
 
-plot(KEY_net, edge.curved = 0,
-     edge.width = 2 * (E(KEY_net)$weight)^0.4, 
+plot(KEY_net_u, edge.curved = 0,
+     edge.width = 2 * (E(KEY_net_u)$weight)^0.4, 
      edge.color = "gray65",
      edge.curved = 1,
-     vertex.label = V(KEY_net)$lab,
+     vertex.label = V(KEY_net_u)$lab,
      vertex.label.font = 2,
      vertex.label.cex = 2.5,
      vertex.label.color = "black", 
-     vertex.size = ifelse(grepl(".*um", names(V(KEY_net))), 20, 1),
-     vertex.color = ifelse(grepl(".*um", names(V(KEY_net))), 
+     vertex.size = ifelse(grepl(".*um", names(V(KEY_net_u))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(KEY_net_u))), 
                            c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
-                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(KEY_net)$depth,breaks = 100))]))
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(KEY_net_u)$depth,breaks = 100))]))
+
+
+# Network Figure Lower Keys
+KEY_net_data_l <- KEY_Ofav %>%
+  filter(region == "Lower_Keys") %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+KEY_edges_l <- KEY_net_data_l %>%
+  gather(key = "Genera", value = "weight", -Sample.Name) %>%
+  filter(weight != 0) %>%
+  mutate(weight = weight^(1))  # use exponent >1 to make rel. abund. matter more; <1 to matter less (i.e., pres/abs)
+
+KEY_depth_l <- KEY_Ofav %>%
+  filter(region == "Lower_Keys") %>%
+  select(Sample.Name, depth)
+
+KEY_verts_l <- tibble(Sample.Name = c(KEY_net_data_l$Sample.Name, colnames(KEY_net_data_l)[-1])) %>%
+  left_join(KEY_depth_l) %>%
+  rename(id = Sample.Name) %>%
+  mutate(lab = case_when(grepl("EX", id) ~ "", grepl("um", id) ~ str_sub(id, start = 1, end = 1))) %>%
+  select(id, depth, lab)
+
+KEY_net_l <- graph_from_data_frame(KEY_edges_l, directed = FALSE, vertices = KEY_verts_l)
+
+set.seed(8)
+
+plot(KEY_net_l, edge.curved = 0,
+     edge.width = 2 * (E(KEY_net_l)$weight)^0.4, 
+     edge.color = "gray65",
+     edge.curved = 1,
+     vertex.label = V(KEY_net_l)$lab,
+     vertex.label.font = 2,
+     vertex.label.cex = 2.5,
+     vertex.label.color = "black", 
+     vertex.size = ifelse(grepl(".*um", names(V(KEY_net_l))), 20, 1),
+     vertex.color = ifelse(grepl(".*um", names(V(KEY_net_l))), 
+                           c('#a6cee3','#1f78b4','#b2df8a','#33a02c'),
+                           colorRampPalette(c("white", "black"))(100)[as.numeric(cut(V(KEY_net_l)$depth,breaks = 100))]))
 
 
 ```
@@ -604,16 +644,101 @@ Ofav<- rbind(AB_Ofav, EX_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav, DRT_Ofav, ELU_Ofav)
 
 ```
 
+# Plotting Depth of Samples from Each Region
+```{r}
+# Depth of Each Sample
+depth <- Ofav %>%
+  select(Sample.Name, region, depth)
+
+# Depth Metrics
+depth %>%
+    summarize(
+    mean = mean(depth, na.rm = TRUE),
+    min = min(depth, na.rm = TRUE),
+    max = max(depth, na.rm = TRUE),
+    median = median(depth, na.rm = TRUE))
+
+# Number of Samples per Region
+sample_size <- depth %>%
+  select(region, depth) %>%
+  group_by(region) %>%
+  tally() %>% 
+  mutate(n = paste("n =", n))
+
+#Depth Boxplot
+ggplot(depth, aes(x = region, y = -(depth), fill = region)) +
+  geom_boxplot() +
+  geom_text(data = sample_size, aes(x = region, y = 1.01, label = n)) +
+  theme(legend.position = "none",
+        axis.title.x = element_text(color = "transparent"))
 
 
 
+```
 
 
+# Plotting Dominant Symbiont vs Depth
+```{r}
+dom_sym_violin <- Ofav %>%
+  select(Sample.Name, region, depth, dom_sym)
 
+# Dominant Symbiont of all Data
+ggplot(dom_sym_violin, aes(x = dom_sym, y = -(depth), fill = dom_sym))+
+  geom_violin() +
+  scale_fill_manual(values=c('#7CAE00','#00BFC4','#C77CFF','#F8766D')) +
+  theme(axis.title.x = element_text(color = "transparent", size = 0.1),
+        legend.position = "none")
 
+# Each Dominant Symbiont by region
+ggplot(dom_sym_violin, aes(x = dom_sym, y = -(depth), fill = dom_sym))+
+  geom_violin() +
+  facet_grid(~region) +
+  scale_fill_manual(values=c('#7CAE00','#00BFC4','#C77CFF','#F8766D')) +
+  theme(axis.text.x = element_text(color = "transparent", size = 0.1),
+        axis.title.x = element_text(color = "transparent", size = 0.1),
+        legend.position = "bottom")
 
+```
 
+#Symbiont Combinations vs Depth
+```{r}
+Ofav_combos <- Ofav %>%
+  select(Sample.Name, depth, region, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  mutate(pattern = case_when(A > 0 & B == 0 & C == 0 & D == 0 ~ "A",
+                             A == 0 & B > 0 & C == 0 & D == 0 ~ "B",
+                             A == 0 & B == 0 & C > 0 & D == 0 ~ "C",
+                             A == 0 & B == 0 & C == 0 & D > 0 ~ "D",
+                             A > 0 & B > 0 & C == 0 & D == 0 ~ "AB",
+                             A > 0 & B == 0 & C > 0 & D == 0 ~ "AC",
+                             A > 0 & B == 0 & C == 0 & D > 0 ~ "AD",
+                             A == 0 & B > 0 & C > 0 & D == 0 ~ "BC",
+                             A == 0 & B > 0 & C == 0 & D > 0 ~ "BD",
+                             A == 0 & B == 0 & C > 0 & D > 0 ~ "CD",
+                             A > 0 & B > 0 & C > 0 & D == 0 ~ "ABC",
+                             A > 0 & B > 0 & C == 0 & D > 0 ~ "ABD",
+                             A > 0 & B == 0 & C > 0 & D > 0 ~ "ACD",
+                             A == 0 & B > 0 & C > 0 & D > 0 ~ "BCD",
+                             A > 0 & B > 0 & C > 0 & D > 0 ~ "ABCD"))
 
+depth_combos <- Ofav_combos %>%
+  select(depth, pattern, region) %>%
+  filter(depth > 0) %>%
+  mutate(depth_int = cut(depth, breaks = 8)) %>%
+  group_by(depth_int, pattern, region) %>%
+  summarise(ncol = n()) %>%
+  mutate(n = sum(ncol), label = paste0("N =", n)) %>%
+  mutate(prop = ncol/n)
+
+ggplot(depth_combos, aes(x = as.factor(depth_int), y = ncol, fill = region)) +
+  geom_bar(stat = "identity", position = "fill") +
+  geom_text(aes(x = as.factor(depth_int), y = 1.01, label = label), size = 3, inherit.aes = FALSE) +
+  facet_wrap(~pattern) +
+  theme(legend.direction = "horizontal", 
+        legend.position = c(0.75,0.1),
+        legend.text = element_text(size = 20),
+        axis.text.x = element_text(angle = -12))
+
+```
 
 
 
@@ -886,7 +1011,6 @@ l <- right_join(r, c, by = "pattern") %>%
   rename(zero = n.x, one = n.y, two = n)
 ```
 
-
 ```{r}
 distinct_combos <- zero_dec %>%
   distinct(A, B, C, D, .keep_all = TRUE)
@@ -980,11 +1104,33 @@ ggsave(filename = "distinct_sample_network.png", width = 300, height = 150, unit
 
 ggsave(filename = "distinct_network.png", width = 300, height = 150, units = "mm")
 
+```
 
+```{r}
+library(statnet)
 
-as_adjacency_matrix(net_distinct, type = c("both"), attr = NULL, edges = TRUE, names = TRUE)
+set.seed(12345)
+
+num_nodes <- 4
+
+matrix <- matrix(round(runif(num_nodes*num_nodes)),
+                 nrow = num_nodes, 
+                 ncol = num_nodes)
+
+diag(matrix) <- 0
+
+net <- as.network(x = matrix, 
+                  directed = FALSE, 
+                  loops = FALSE, 
+                  matrix.type = "adjacency")
+
+network.vertex.names(net) <- LETTERS[1:4]
 
 ```
+
+
+
+
 
 
 # Adjacency Matrix of Distinct Samples
@@ -1008,18 +1154,29 @@ matrix <- symbiont_pres %>%
          AD = ifelse(A > 0 & D > 0, 1, 0),
          BC = ifelse(B > 0 & C > 0, 1, 0),
          BD = ifelse(B > 0 & D > 0, 1, 0),
-         CD = ifelse(C > 0 & D > 0, 1, 0),
-         ABC = ifelse(A > 0 & B > 0 & C > 0, 1, 0),
-         ABD = ifelse(A > 0 & B > 0 & D > 0, 1, 0),
-         ACD = ifelse(A > 0 & C > 0 & D > 0, 1, 0),
-         BCD = ifelse(B > 0 & C > 0 & D > 0, 1, 0),
-         ABCD = ifelse( A > 0 & B > 0 & C > 0 & D > 0, 1, 0)) 
+         CD = ifelse(C > 0 & D > 0, 1, 0)) %>%
+   select(A = AA, B = BB, C = CC, D = DD, AB, AC, AD, BC, BD, CD)
+
+colSums(matrix)
+
+
+tribble(
+  ~colA, ~colB, ~weight,
+  "A", "B", 24,
+  "A", "C", 19,
+  "A", "D", 17,
+  "B", "C", 33,
+  "B", "D", 40,
+  "C", "D", 37
+)
 
 
 
-sums <- matrix %>%
-  select(A = AA, B = BB, C = CC, D = DD, AB, AC, AD, BC, BD, CD, ABC, ACD, BCD, ABCD) %>%
-  colSums()
+
+
+as.matrix(matrix)
+
+
 
        
 edges <- tribble(
@@ -1034,7 +1191,7 @@ edges <- tribble(
 nodes <- c("A", "B", "C", "D")
 
 nn <- graph_from_data_frame(edges, directed = FALSE, vertices = nodes)
-plot(nn, edge.width = E(nn)$weight)
+plot(nn, edge.width = E(nn)$weight^0.7)
                     
 ```
 
@@ -1059,6 +1216,43 @@ hist <- symbiont_pres %>%
   
 
 ```
+
+
+```{r}
+library(eulerr)
+set.seed(1)
+
+s2 <- c(A = 1, B = 2, C = 3, D = 4)
+
+plot(venn(s2))
+
+
+plot(euler(s2), quantities = TRUE)
+
+
+
+
+
+uniform_intersections <- euler(c("A" = 1, "B" = 1, "C" = 2,"D" = 1,
+                                 "A&B" = 24, "A&C" = 19, "A&D" = 17, "B&C" = 33, "B&D" = 40, "C&D" = 37))
+                            
+plot(uniform_intersections)
+
+
+
+
+
+uniform_intersections <- euler(c("A" = 1, "B" = 1, "C" = 2,"D" = 1,
+                                 "A&B" = 24, "A&C" = 19, "A&D" = 17, "B&C" = 33, "B&D" = 40, "C&D" = 37))
+                            
+plot(uniform_intersections)
+
+```
+
+
+
+
+
 
 
 

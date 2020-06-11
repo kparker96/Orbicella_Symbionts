@@ -630,15 +630,27 @@ plot(KEY_net_l, edge.curved = 0,
 # Combining Exumas, Abacao, Curaco, Florida Keys & establishing Dominant Symbiont
 ```{r}
 Ofav<- rbind(AB_Ofav, EX_Ofav, KEY_Ofav, CUR_Ofav, MIA_Ofav, DRT_Ofav, ELU_Ofav) %>%
-  mutate(dom_sym = case_when(Breviolum > Cladocopium & Breviolum > Durusdinium & Breviolum > Symbiodinium
-                             ~ "Breviolum",
-                             Cladocopium > Breviolum & Cladocopium > Durusdinium & Cladocopium > Symbiodinium
-                             ~ "Cladocopium",
-                             Durusdinium > Breviolum & Durusdinium > Cladocopium & Durusdinium > Symbiodinium
-                             ~ "Durusdinium",
-                             Symbiodinium > Breviolum & Symbiodinium > Cladocopium & Symbiodinium >
-                             Durusdinium ~ "Symbiodinium")) %>%
-  select(Sample.Name, region, site, depth, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym) %>%
+  rename(A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  mutate(dom_sym = case_when(B > C & B > D & B > A ~ "B",
+                             C > B & C > D & C > A ~ "C",
+                             D > B & D > C & D > A ~ "D",
+                             A > B & A > C & A > D ~ "A")) %>%
+  mutate(pattern = case_when(A > 0 & B == 0 & C == 0 & D == 0 ~ "A",
+                             A == 0 & B > 0 & C == 0 & D == 0 ~ "B",
+                             A == 0 & B == 0 & C > 0 & D == 0 ~ "C",
+                             A == 0 & B == 0 & C == 0 & D > 0 ~ "D",
+                             A > 0 & B > 0 & C == 0 & D == 0 ~ "AB",
+                             A > 0 & B == 0 & C > 0 & D == 0 ~ "AC",
+                             A > 0 & B == 0 & C == 0 & D > 0 ~ "AD",
+                             A == 0 & B > 0 & C > 0 & D == 0 ~ "BC",
+                             A == 0 & B > 0 & C == 0 & D > 0 ~ "BD",
+                             A == 0 & B == 0 & C > 0 & D > 0 ~ "CD",
+                             A > 0 & B > 0 & C > 0 & D == 0 ~ "ABC",
+                             A > 0 & B > 0 & C == 0 & D > 0 ~ "ABD",
+                             A > 0 & B == 0 & C > 0 & D > 0 ~ "ACD",
+                             A == 0 & B > 0 & C > 0 & D > 0 ~ "BCD",
+                             A > 0 & B > 0 & C > 0 & D > 0 ~ "ABCD")) %>%
+  select(Sample.Name, region, site, depth, Symbiodinium = A, Breviolum = B, Cladocopium = C, Durusdinium = D, dom_sym, pattern) %>%
   mutate(depth = as.numeric(depth)) %>%
   ungroup() 
 
@@ -667,7 +679,7 @@ sample_size <- depth %>%
 
 #Depth Boxplot
 ggplot(depth, aes(x = region, y = -(depth), fill = region)) +
-  geom_boxplot() +
+  geom_violin(width = 3) +
   geom_text(data = sample_size, aes(x = region, y = 1.01, label = n)) +
   theme(legend.position = "none",
         axis.title.x = element_text(color = "transparent"))
@@ -702,25 +714,7 @@ ggplot(dom_sym_violin, aes(x = dom_sym, y = -(depth), fill = dom_sym))+
 
 #Symbiont Combinations vs Depth
 ```{r}
-Ofav_combos <- Ofav %>%
-  select(Sample.Name, depth, region, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
-  mutate(pattern = case_when(A > 0 & B == 0 & C == 0 & D == 0 ~ "A",
-                             A == 0 & B > 0 & C == 0 & D == 0 ~ "B",
-                             A == 0 & B == 0 & C > 0 & D == 0 ~ "C",
-                             A == 0 & B == 0 & C == 0 & D > 0 ~ "D",
-                             A > 0 & B > 0 & C == 0 & D == 0 ~ "AB",
-                             A > 0 & B == 0 & C > 0 & D == 0 ~ "AC",
-                             A > 0 & B == 0 & C == 0 & D > 0 ~ "AD",
-                             A == 0 & B > 0 & C > 0 & D == 0 ~ "BC",
-                             A == 0 & B > 0 & C == 0 & D > 0 ~ "BD",
-                             A == 0 & B == 0 & C > 0 & D > 0 ~ "CD",
-                             A > 0 & B > 0 & C > 0 & D == 0 ~ "ABC",
-                             A > 0 & B > 0 & C == 0 & D > 0 ~ "ABD",
-                             A > 0 & B == 0 & C > 0 & D > 0 ~ "ACD",
-                             A == 0 & B > 0 & C > 0 & D > 0 ~ "BCD",
-                             A > 0 & B > 0 & C > 0 & D > 0 ~ "ABCD"))
-
-depth_combos <- Ofav_combos %>%
+depth_combos <- Ofav %>%
   select(depth, pattern, region) %>%
   filter(depth > 0) %>%
   mutate(depth_int = cut(depth, breaks = 8)) %>%
@@ -741,12 +735,107 @@ ggplot(depth_combos, aes(x = as.factor(depth_int), y = ncol, fill = region)) +
 ```
 
 
+#Proportion of Symbionts each sample, facet by pattern 
+```{r}
+a <- Ofav %>%
+  filter(pattern != "A", pattern != "B", pattern != "C", pattern != "D") %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium, dom_sym, pattern) %>%
+  gather(key = "sym", value = "value", -Sample.Name, -pattern, -dom_sym)
+  
+
+ggplot(a, aes(x = Sample.Name, y = value, fill = sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_wrap(~pattern, scales = "free") +
+  theme(legend.direction = "horizontal", 
+        legend.position = c(0.75,0.1),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 25),
+        axis.text.x = element_text(color = "transparent", size = 0.3),
+        axis.title.x = element_blank()) +
+  scale_fill_manual(values=c('#7CAE00','#00BFC4','#C77CFF','#F8766D')) 
+```
+
+#Proportion of Dominant Symbiont for Patterns
+```{r}
+b <- a %>%
+  select(Sample.Name, pattern, dom_sym) %>%
+  group_by(pattern, dom_sym) %>%
+  summarise(ncol = n()) %>%
+  mutate(n = sum(ncol), label = paste0("N =", n))
+  
+ggplot(b, aes(x = pattern, y = ncol, fill = dom_sym)) +
+  geom_bar(stat = "identity", position = "fill") +
+  geom_text(aes(x = pattern, y = 1.05, label =label))
+```
+
+
+#Histogram of Whole Dataset
+```{r}
+hist <- Ofav %>%
+  select(Sample.Name, dom_sym, pattern, A= Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  mutate(A = ifelse(A > 0, 1, 0),
+         B = ifelse(B > 0, 1, 0),
+         C = ifelse(C > 0, 1, 0),
+         D = ifelse(D > 0, 1, 0)) %>%
+  mutate(degree = A + B + C + D)
+
+ ggplot(hist, aes(x = degree)) + 
+   geom_histogram(binwidth = 0.9) +
+   theme_bw()
+
+ ggplot(hist, aes(x = degree)) + 
+   geom_histogram(binwidth = 0.9) +
+   facet_wrap(~dom_sym) +
+   theme_bw()
+
+```
+
+#Tetrahedron
+```{r}
+library(compositions)
+library(rgl)
+
+z <- Ofav %>%
+  select(Sample.Name, Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+  
+as.data.frame(z)
+
+z <- cbind(runif(z$Symbiodinium), runif(z$Breviolum), runif(z$Cladocopium), runif(z$Durusdinium))
+
+z <- z/rowSums(z)
+
+Acomp <- acomp(z)
+
+plot3D(Acomp,  cex=10, col="red", log=FALSE, coors=T, bbox=F, scale=F, center=F, axis.col=1, axes=TRUE)
+```
+
+```{r}
+#Relative Abundance Each Symbiont 
+S <- Ofav$Symbiodinium
+
+B <- Ofav$Breviolum
+
+C <- Ofav$Cladocopium
+
+D <- Ofav$Durusdinium
+
+
+# Tetrahedron Plot 
+rgl.open()
+rgl.bg(color = "white")
+rgl.points(S, B, C, D, size = 5, color = "black")
+rgl.lines(c(0, 1), c(0, 0), c(0, 0), color = "yellow") # x-axis
+rgl.lines(c(0, 0), c(0, 1), c(0, 0), color = "red") # y-axis
+rgl.lines(c(0, 0), c(0, 0), c(0, 1), color = "green") # z-axis
+rgl.lines(c(0, 1), c(1, 0), c(0, 0), color = "black")
+rgl.lines(c(0, 0), c(1, 0), c(0, 1), color = "black")
+rgl.lines(c(1, 0), c(0, 0), c(0, 1), color = "black")
 
 
 
 
 
-
+```
 
 
 
@@ -1217,41 +1306,58 @@ hist <- symbiont_pres %>%
 
 ```
 
-
+# Proportinal Venn Diagram
 ```{r}
 library(eulerr)
-set.seed(1)
-
-s2 <- c(A = 1, B = 2, C = 3, D = 4)
-
-plot(venn(s2))
 
 
-plot(euler(s2), quantities = TRUE)
-
-
-
-
-
-uniform_intersections <- euler(c("A" = 1, "B" = 1, "C" = 2,"D" = 1,
-                                 "A&B" = 24, "A&C" = 19, "A&D" = 17, "B&C" = 33, "B&D" = 40, "C&D" = 37))
-                            
-plot(uniform_intersections)
-
-
-
-
-
-uniform_intersections <- euler(c("A" = 1, "B" = 1, "C" = 2,"D" = 1,
-                                 "A&B" = 24, "A&C" = 19, "A&D" = 17, "B&C" = 33, "B&D" = 40, "C&D" = 37))
+uniform_intersections <- euler(c("A" = 1, "B" = 43, "C" = 30,"D" = 104,
+                                 "A&B" = 13, "A&C" = 3, "B&C" = 11, "B&D" = 9, "C&D" = 52, "A&B&C" = 5,
+                                 "A&B&C&D" = 5, "A&B&D" = 4, "A&C&D" = 7, "B&C&D" = 14))
                             
 plot(uniform_intersections)
 
 ```
 
+#Tetrahedron Analysis
+```{r}
+library(compositions)
+  
+data(SimulatedAmounts)
+dat <- rcomp(sa.lognormals)
+dat
+
+plot(dat)
+```
+
+
+```{r}
+data(SimulatedAmounts)
+dat <- rcomp(sa.groups5)
+hc <- hclust(dist(dat), method = "complete")  # data are clustered 
+kingTetrahedron(dat,parts=1:4, file="myfirst.kin", clu=cutree(hc,7),
+scale=0.2)
 
 
 
+
+
+
+
+
+
+
+x <- distinct_combos %>%
+  select(A, B, C, D)
+
+dataa <- rcomp(x)
+
+bb <- kingTetrahedron(dataa, parts = 1:4, file = "myfirst.kin", clu = NULL, vec = NULL, )
+
+plot(bb)
+
+
+```
 
 
 

@@ -684,8 +684,11 @@ ggplot(depth, aes(x = region, y = -(depth), fill = region)) +
   theme(legend.position = "none",
         axis.title.x = element_text(color = "transparent"))
 
-
-
+Ofav %>%
+  select(Sample.Name, depth) %>%
+  mutate(place = "L") %>%
+  ggplot(aes(x = place, y = -(depth))) +
+    geom_violin()
 ```
 
 
@@ -836,6 +839,156 @@ rgl.lines(c(1, 0), c(0, 0), c(0, 1), color = "black")
 
 
 ```
+
+# Calculating Ecological Indices 
+```{r}
+# n = # of individuals of one particular species found in sample 
+# N = # of organisms in  sample 
+# s = # of different species in a sample 
+# p = proportion (n/N)
+
+# diversity =
+     # Shannon Diversity = sum(p * ln(p))
+# richness =
+     # species Richness = s/sqrt(N)
+# evenness = 
+     # Evenness = Shannon Diversity/ln(Species Richness)
+
+s <- Ofav %>%
+  select(Sample.Name, A= Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  mutate(A = ifelse(A > 0, 1, 0),
+         B = ifelse(B > 0, 1, 0),
+         C = ifelse(C > 0, 1, 0),
+         D = ifelse(D > 0, 1, 0)) %>%
+  mutate(s = A + B + C + D) %>%
+  select(Sample.Name, s)
+
+n <- Ofav %>%
+  select(Sample.Name, A.n = Symbiodinium, B.n = Breviolum, C.n = Cladocopium, D.n = Durusdinium) %>%
+  mutate(A.n = A.n * 100, B.n = B.n * 100, C.n = C.n * 100, D.n = D *100) %>%
+  mutate(A.n = round(A.n, digits = 0),
+         B.n = round(B.n, digits = 0),
+         C.n = round(C.n, digits = 0),
+         D.n = round(D.n, digits = 0))
+N <- n %>%
+  group_by(Sample.Name) %>%
+  mutate(N = sum(A.n + B.n + C.n + D.n)) %>%
+  ungroup()
+
+p <- N %>% 
+  mutate(A.p = A.n/N, B.p = B.n/N, C.p = C.n/N, D.p = D.n/N) %>%
+  mutate(A.lnp = A.p * log(A.p),
+         B.lnp = B.p * log(B.p),
+         C.lnp = C.p * log(C.p),
+         D.lnp = D.p * log(D.p)) 
+
+ind_calc <- p %>%
+  right_join(s) %>%
+  group_by(Sample.Name) %>%
+  mutate(diversity = sum(A.lnp, B.lnp, C.lnp, D.lnp, na.rm = TRUE)) %>%
+  mutate(diversity = abs(diversity)) %>%
+  mutate(richness = s/sqrt(N)) %>%
+  mutate(evenness = diversity/log(richness)) %>%
+  ungroup()
+
+indices <- ind_calc %>%
+  select(Sample.Name, diversity, richness, evenness) %>%
+  right_join(Ofav) %>%
+  select(Sample.Name, depth, site, region, diversity, richness, evenness)
+
+ggplot(indices, aes(x = region, y = evenness, fill = region)) +
+  geom_violin() +
+  theme(legend.position = "none")
+
+```
+
+
+#multivariette 
+```{r}
+library(compositions)
+
+comps <- acomp(sa.lognormals)
+plot(comps)
+
+amounts <- aplus(sa.lognormals)
+plot(amounts)
+data(SimulatedAmounts)
+
+
+
+data(SimulatedAmounts)
+plot(rcomp(sa.dirichlet5))
+
+boxplot(acomp(x))
+
+boxplot(rcomp(x))
+
+
+x <- Ofav %>%
+  select(Symbiodinium, Breviolum, Cladocopium, Durusdinium)
+
+ACOMP <- acomp(x)
+plot(ACOMP)
+
+
+RCOMP <- rcomp(x)
+plot(RCOMP)
+
+
+
+```
+
+```{r}
+f <- Ofav %>%
+  select(Sample.Name, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium, pattern) %>%
+  mutate(pattern = case_when(A > 0.01 & B < 0.01 & C < 0.01 & D < 0.01 ~ "A",
+                             A < 0.01 & B > 0.01 & C < 0.01 & D < 0.01 ~ "B",
+                             A < 0.01 & B < 0.01 & C > 0.01 & D < 0.01  ~ "C",
+                             A < 0.01 & B < 0.1 & C < 0.01 & D < 0.01 ~ "D",
+                             A > 0.01 & B > 0.01 & C == 0 & D == 0 ~ "AB",
+                             A > 0.01 & B == 0 & C > 0.01 & D == 0 ~ "AC",
+                             A > 0.01 & B == 0 & C == 0 & D > 0.01 ~ "AD",
+                             A == 0 & B > 0.01 & C > 0.01 & D == 0 ~ "BC",
+                             A == 0 & B > 0.01 & C == 0 & D > 0.01 ~ "BD",
+                             A == 0 & B == 0 & C > 0.01 & D > 0.01 ~ "CD",
+                             A > 0.01 & B > 0.01 & C > 0.01 & D == 0 ~ "ABC",
+                             A > 0.01 & B > 0.01 & C == 0 & D > 0.01 ~ "ABD",
+                             A > 0.01 & B == 0 & C > 0.01 & D > 0.01 ~ "ACD",
+                             A == 0 & B > 0.01 & C > 0.01 & D > 0.01 ~ "BCD",
+                             A > 0.01 & B > 0.01 & C > 0.01 & D > 0.01 ~ "ABCD")) %>%
+  filter(pattern == "ABC" | pattern == "BCD" | pattern == "ACD"| pattern == "ABCD")
+
+Ofav %>%
+  select(Sample.Name, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium, pattern, dom_sym) %>%
+  mutate(first = case_when(B > C & B > D & B > A ~ B,
+                             C > B & C > D & C > A ~ C,
+                             D > B & D > C & D > A ~ D,
+                             A > B & A > C & A > D ~ A)) %>%
+  mutate(second = case_when(A < first & A  ~ "A"))
+
+
+
+
+
+
+
+
+
+
+
+ff <- f %>%
+  group_by(Sample.Name) %>%
+  mutate()
+    
+    
+    
+    
+    avg_sd == avg_sd[which.min(avg_sd)])
+
+
+```
+
+
 
 
 

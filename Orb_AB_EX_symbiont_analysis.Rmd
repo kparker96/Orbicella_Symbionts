@@ -886,7 +886,7 @@ ind_calc <- p %>%
   right_join(s) %>%
   group_by(Sample.Name) %>%
   mutate(diversity = sum(A.lnp, B.lnp, C.lnp, D.lnp, na.rm = TRUE)) %>%
-  mutate(diversity = abs(diversity)) %>%
+  mutate(diversity = diversity) %>%
   mutate(richness = s/sqrt(N)) %>%
   mutate(evenness = diversity/log(richness)) %>%
   ungroup()
@@ -967,8 +967,10 @@ Ofav %>%
   mutate(second = case_when(A < first & A  ~ "A"))
 
 
-
-
+test<- Ofav %>%
+  select(Sample.Name, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  nest(-Sample.Name) %>% 
+  mutate(first = map(data, ~ sort(., decreasing = TRUE))) 
 
 
 
@@ -981,9 +983,7 @@ ff <- f %>%
   mutate()
     
     
-    
-    
-    avg_sd == avg_sd[which.min(avg_sd)])
+   
 
 
 ```

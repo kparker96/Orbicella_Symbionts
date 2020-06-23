@@ -967,10 +967,20 @@ Ofav %>%
   mutate(second = case_when(A < first & A  ~ "A"))
 
 
+<<<<<<< HEAD
 test<- Ofav %>%
   select(Sample.Name, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
   nest(-Sample.Name) %>% 
   mutate(first = map(data, ~ sort(., decreasing = TRUE))) 
+=======
+Ofav %>%
+  select(Sample.Name, A = Symbiodinium, B = Breviolum, C = Cladocopium, D = Durusdinium) %>%
+  nest(-Sample.Name) %>%
+  mutate( first = map_chr(data, ~names(sort(., decreasing = TRUE))[1]),
+         second = map_chr(data, ~names(sort(., decreasing = TRUE))[2]))
+  
+
+>>>>>>> aceb6c29e27967e516c2bd1bcc0284f7973e592f
 
 
 
